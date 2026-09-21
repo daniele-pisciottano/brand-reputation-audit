@@ -1,0 +1,439 @@
+[
+ {
+  "name": "CONSEGNA E CORRIERE",
+  "definition": "Tempi di consegna, corriere, punto di ritiro, pacchi mai arrivati. Include le lodi alla consegna rapida.",
+  "volume": 98,
+  "share": 0.312,
+  "sentiment": {
+   "positive": 38,
+   "neutral": 6,
+   "negative": 33,
+   "mixed": 21
+  },
+  "by_source": {
+   "Trustpilot": 91,
+   "Instagram": 6,
+   "YouTube": 1
+  },
+  "quotes": [
+   {
+    "text": "25 euro di reso. Ordino selezionando per sbaglio una taglia errata. Scrivo immediatamente all’assistenza ma inviano ugualmente la taglia sbagliata. Faccio il reso. Qual’è il problema? Il...",
+    "source": "Trustpilot",
+    "date": "2025-09-25",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Veloce e con ampia gamma di scelta. Sono alle prime armi nel mondo degli integratori per lo sport Ho acquistato Whey isolate: mi ha colpita la ricchezza di gusti tra cui poter scegliere....",
+    "source": "Trustpilot",
+    "date": "2026-03-06",
+    "sentiment": "positive"
+   },
+   {
+    "text": "Dopo 20 giorni senza spedizione mi viene offerto solo il rimborso. È il minimo previsto per legge, non un servizio. Mi aspettavo almeno una compensazione o un’alternativa. Credo che i...",
+    "source": "Instagram",
+    "date": "2026-04-24",
+    "sentiment": "negative"
+   }
+  ]
+ },
+ {
+  "name": "PREZZO E SCONTI",
+  "definition": "Livello dei prezzi, aumenti, credibilità degli sconti, soglia di spedizione gratuita.",
+  "volume": 73,
+  "share": 0.232,
+  "sentiment": {
+   "positive": 26,
+   "neutral": 7,
+   "negative": 26,
+   "mixed": 14
+  },
+  "by_source": {
+   "Trustpilot": 59,
+   "Instagram": 3,
+   "YouTube": 2,
+   "Reddit": 9
+  },
+  "quotes": [
+   {
+    "text": "25 euro di reso. Ordino selezionando per sbaglio una taglia errata. Scrivo immediatamente all’assistenza ma inviano ugualmente la taglia sbagliata. Faccio il reso. Qual’è il problema? Il...",
+    "source": "Trustpilot",
+    "date": "2025-09-25",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Veloce e con ampia gamma di scelta. Sono alle prime armi nel mondo degli integratori per lo sport Ho acquistato Whey isolate: mi ha colpita la ricchezza di gusti tra cui poter scegliere....",
+    "source": "Trustpilot",
+    "date": "2026-03-06",
+    "sentiment": "positive"
+   },
+   {
+    "text": "Ecco, diciamolo una volta per tutte. Spendere tutti quei soldi per delle semplici whey, quando puoi trovare la stessa identica materia prima, della stessa qualità, ad un quarto del prezzo,...",
+    "source": "YouTube",
+    "date": "",
+    "sentiment": "positive"
+   }
+  ]
+ },
+ {
+  "name": "QUALITÀ E SCADENZE",
+  "definition": "Qualità percepita del prodotto, analisi, ingredienti, digeribilità, date di scadenza ravvicinate.",
+  "volume": 71,
+  "share": 0.226,
+  "sentiment": {
+   "positive": 26,
+   "neutral": 6,
+   "negative": 23,
+   "mixed": 16
+  },
+  "by_source": {
+   "Trustpilot": 55,
+   "Instagram": 3,
+   "YouTube": 12,
+   "Reddit": 1
+  },
+  "quotes": [
+   {
+    "text": "2 pacchi di snack con scadenza molto vicina. Ho ordinato 2 pacchi di snack ma scadevano nel giro di 1 mese segno che erano lì da tanto tempo. Ho segnalato e chiesto altri 2 campioni in...",
+    "source": "Trustpilot",
+    "date": "2026-07-25",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Grande delusione, gusto terribile e pesante da digerire. Il gusto delle proteine al cioccolato fondente è terribile, fa letteralmente venire il volta stomaco. Inoltre mi risulta molto...",
+    "source": "Trustpilot",
+    "date": "2026-03-02",
+    "sentiment": "mixed"
+   },
+   {
+    "text": "buongiorno, non ho mai acquistato su myprotein, volevo chiederti dove hai pubblicato le analisi fatte da te personalmente?? sono curioso di veder i valori amminoacidi visto il prezzo non...",
+    "source": "YouTube",
+    "date": "",
+    "sentiment": "neutral"
+   }
+  ]
+ },
+ {
+  "name": "ASSISTENZA, RESI E RIMBORSI",
+  "definition": "Servizio clienti, tempi e qualità delle risposte, resi a pagamento, rimborsi.",
+  "volume": 54,
+  "share": 0.172,
+  "sentiment": {
+   "positive": 7,
+   "neutral": 1,
+   "negative": 36,
+   "mixed": 10
+  },
+  "by_source": {
+   "Trustpilot": 50,
+   "Instagram": 4
+  },
+  "quotes": [
+   {
+    "text": "Non si trattano così i clienti. Non si trattano così i clienti, dal servizio assistenza , ad una domanda che ho posto ed uno screenshot che ho inviato (quindi nessun dubbio) mi rimbalzavano...",
+    "source": "Trustpilot",
+    "date": "2026-03-27",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Non è la prima volta che compro…. Non è la prima volta che compro prodotti Myprotein...ma devo dire che è peggiorato....prima i prodotti arrivavano protetti e incartati bene....ho appena...",
+    "source": "Trustpilot",
+    "date": "2026-07-01",
+    "sentiment": "mixed"
+   },
+   {
+    "text": "Dopo 20 giorni senza spedizione mi viene offerto solo il rimborso. È il minimo previsto per legge, non un servizio. Mi aspettavo almeno una compensazione o un’alternativa. Credo che i...",
+    "source": "Instagram",
+    "date": "2026-04-24",
+    "sentiment": "negative"
+   }
+  ]
+ },
+ {
+  "name": "PACCO E IMBALLAGGIO",
+  "definition": "Confezioni rotte, aperte, sporche o schiacciate, protezione del pacco. Non include gli articoli mancanti.",
+  "volume": 51,
+  "share": 0.162,
+  "sentiment": {
+   "positive": 3,
+   "neutral": 7,
+   "negative": 21,
+   "mixed": 20
+  },
+  "by_source": {
+   "Trustpilot": 51
+  },
+  "quotes": [
+   {
+    "text": "Prodotto in quantità minore e confezione danneggiata . Buonasera, nell’ordine con numero 748613963 avevo ordinato la crema di riso al gusto cioccolato nella confezione per 1kg e il pacco mi...",
+    "source": "Trustpilot",
+    "date": "2026-04-01",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Non è la prima volta che compro…. Non è la prima volta che compro prodotti Myprotein...ma devo dire che è peggiorato....prima i prodotti arrivavano protetti e incartati bene....ho appena...",
+    "source": "Trustpilot",
+    "date": "2026-07-01",
+    "sentiment": "mixed"
+   }
+  ]
+ },
+ {
+  "name": "GUSTO E CONSISTENZA",
+  "definition": "Sapore, odore, solubilità e grumi delle proteine e degli snack.",
+  "volume": 48,
+  "share": 0.153,
+  "sentiment": {
+   "positive": 14,
+   "neutral": 0,
+   "negative": 14,
+   "mixed": 20
+  },
+  "by_source": {
+   "Trustpilot": 40,
+   "Instagram": 1,
+   "YouTube": 3,
+   "Reddit": 4
+  },
+  "quotes": [
+   {
+    "text": "Cliente scontento. Sono cliente da due anni ed è la sesta volta che ordino le stesse proteine al gusto caramello salato,nelle ultime consegne sembra non esserci più uno standard...",
+    "source": "Trustpilot",
+    "date": "2026-02-01",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Veloce e con ampia gamma di scelta. Sono alle prime armi nel mondo degli integratori per lo sport Ho acquistato Whey isolate: mi ha colpita la ricchezza di gusti tra cui poter scegliere....",
+    "source": "Trustpilot",
+    "date": "2026-03-06",
+    "sentiment": "positive"
+   },
+   {
+    "text": "Alternative alle Proteine Prozis?. consumavo le MyProtein clear, avevo acquistato tipo 4 barattoli ed era diventato un inferno finirle... (vari gusti presi per via di una super offerta)....",
+    "source": "Reddit",
+    "date": "2026-09-20",
+    "sentiment": "negative"
+   }
+  ]
+ },
+ {
+  "name": "ORDINE ERRATO O INCOMPLETO",
+  "definition": "Articoli sbagliati o mancanti, misurino assente, omaggi promessi e non arrivati.",
+  "volume": 34,
+  "share": 0.108,
+  "sentiment": {
+   "positive": 5,
+   "neutral": 4,
+   "negative": 18,
+   "mixed": 7
+  },
+  "by_source": {
+   "Trustpilot": 34
+  },
+  "quotes": [
+   {
+    "text": "25 euro di reso. Ordino selezionando per sbaglio una taglia errata. Scrivo immediatamente all’assistenza ma inviano ugualmente la taglia sbagliata. Faccio il reso. Qual’è il problema? Il...",
+    "source": "Trustpilot",
+    "date": "2025-09-25",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Scatola inadeguata . Scatola che contiene 5 kg di prodotti deve essere robusta. Invece... Va bene risparmiare sui costi della spedizione, ma mandare una, scatola completamente disfatta al...",
+    "source": "Trustpilot",
+    "date": "2026-02-25",
+    "sentiment": "mixed"
+   }
+  ]
+ },
+ {
+  "name": "GIUDIZIO GENERALE",
+  "definition": "Valutazioni complessive senza un tema specifico (per esempio 'tutto perfetto').",
+  "volume": 26,
+  "share": 0.083,
+  "sentiment": {
+   "positive": 23,
+   "neutral": 0,
+   "negative": 1,
+   "mixed": 2
+  },
+  "by_source": {
+   "Trustpilot": 23,
+   "Instagram": 1,
+   "YouTube": 2
+  },
+  "quotes": [
+   {
+    "text": "Non è oro tutto ciò che luccica . E la terza volta che acquisto su myprotein i prodotti che ho provato sono ottimi crema di riso avena e proteine ma per i regali che danno tipo Amazon prime...",
+    "source": "Trustpilot",
+    "date": "2026-03-14",
+    "sentiment": "positive"
+   },
+   {
+    "text": "Sono cliente Myprotein e mi trovo bene. anche io ho la tua filosofia sugli integratori, pochi ma con ricerca scientifica. sono curioso di vedere che brand sceglierai!",
+    "source": "YouTube",
+    "date": "",
+    "sentiment": "positive"
+   },
+   {
+    "text": "Mai più comprerò un prodotto da voi",
+    "source": "Instagram",
+    "date": "2026-07-29",
+    "sentiment": "negative"
+   }
+  ]
+ },
+ {
+  "name": "SITO, APP E PAGAMENTO",
+  "definition": "Checkout, app, modifica dell'ordine, account, metodi di pagamento.",
+  "volume": 24,
+  "share": 0.076,
+  "sentiment": {
+   "positive": 2,
+   "neutral": 0,
+   "negative": 19,
+   "mixed": 3
+  },
+  "by_source": {
+   "Trustpilot": 23,
+   "YouTube": 1
+  },
+  "quotes": [
+   {
+    "text": "25 euro di reso. Ordino selezionando per sbaglio una taglia errata. Scrivo immediatamente all’assistenza ma inviano ugualmente la taglia sbagliata. Faccio il reso. Qual’è il problema? Il...",
+    "source": "Trustpilot",
+    "date": "2025-09-25",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Ottimo. Prodotti di ottima qualità ma prezzi costantemente in aumento, al momento non hanno i prezzi migliori. Sito affidabile e ci acquisto da 10 anni ma bisogna tenere monitorato sconti e...",
+    "source": "Trustpilot",
+    "date": "2026-09-08",
+    "sentiment": "mixed"
+   }
+  ]
+ },
+ {
+  "name": "COMPETITOR E ALTERNATIVE",
+  "definition": "Passaggio ad altri brand o consigli di alternative (HSN, Bulk, Prozis, Yamamoto, Foodspring).",
+  "volume": 19,
+  "share": 0.061,
+  "sentiment": {
+   "positive": 0,
+   "neutral": 12,
+   "negative": 7,
+   "mixed": 0
+  },
+  "by_source": {
+   "YouTube": 4,
+   "Reddit": 15
+  },
+  "quotes": [
+   {
+    "text": "Non c’è paragone, my protein e FOODSPRING sono su due livelli completamente diversi, chi si lamenta dei prezzi un po' alti di foodspring non sa di cosa sta parlando, la qualitá si paga!...",
+    "source": "YouTube",
+    "date": "",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Anche io utilizzo i prodotti di myprotein da 3 anni, ma ormai ho lasciato tutto meno che l'abbigliamento o i dolcificanti Glutammina da prozis Barrette da bulkpowers Crema al cocco da...",
+    "source": "YouTube",
+    "date": "",
+    "sentiment": "negative"
+   }
+  ]
+ },
+ {
+  "name": "CREATOR E SPONSOR",
+  "definition": "Commenti sui creator che hanno lasciato Myprotein come sponsor (video del 2019-2020).",
+  "volume": 16,
+  "share": 0.051,
+  "sentiment": {
+   "positive": 3,
+   "neutral": 10,
+   "negative": 3,
+   "mixed": 0
+  },
+  "by_source": {
+   "YouTube": 16
+  },
+  "quotes": [
+   {
+    "text": "La penso come te Giulio!!! Anche secondo me sono pochi i prodotti FONDAMENTALI.. Nonostante ci sia una vasta scelta... Hai fatto bene a voler cambiare se cosi ti sentivi di fare!!! Io credo...",
+    "source": "YouTube",
+    "date": "",
+    "sentiment": "neutral"
+   },
+   {
+    "text": "Bravo, non è da tutto mollare uno sponsor dicendo che cmq fa prodotti di qualità. Che poi neanche è vero, Myprotein (come Bulk) ormai fa i kitkat e i biscotti, altro che fitness, è la...",
+    "source": "YouTube",
+    "date": "",
+    "sentiment": "negative"
+   }
+  ]
+ },
+ {
+  "name": "ABBIGLIAMENTO",
+  "definition": "Taglie, vestibilità e tenuta dei capi della linea abbigliamento.",
+  "volume": 10,
+  "share": 0.032,
+  "sentiment": {
+   "positive": 5,
+   "neutral": 2,
+   "negative": 2,
+   "mixed": 1
+  },
+  "by_source": {
+   "Trustpilot": 9,
+   "Instagram": 1
+  },
+  "quotes": [
+   {
+    "text": "25 euro di reso. Ordino selezionando per sbaglio una taglia errata. Scrivo immediatamente all’assistenza ma inviano ugualmente la taglia sbagliata. Faccio il reso. Qual’è il problema? Il...",
+    "source": "Trustpilot",
+    "date": "2025-09-25",
+    "sentiment": "negative"
+   },
+   {
+    "text": "Super! . L’abbigliamento è di altissima qualità. Uso leggins e shorts ed entrambi sono comodi durante l’allenamento, splendida vestibilità, valorizzano le forme e non sono trasparenti....",
+    "source": "Trustpilot",
+    "date": "2026-07-04",
+    "sentiment": "positive"
+   },
+   {
+    "text": "Meravigliosaaa ✨ che taglia hai preso per gli shorts?",
+    "source": "Instagram",
+    "date": "2026-09-14",
+    "sentiment": "neutral"
+   }
+  ]
+ },
+ {
+  "name": "ASSORTIMENTO",
+  "definition": "Ampiezza della gamma, prodotti ritirati o mancanti a catalogo.",
+  "volume": 6,
+  "share": 0.019,
+  "sentiment": {
+   "positive": 3,
+   "neutral": 3,
+   "negative": 0,
+   "mixed": 0
+  },
+  "by_source": {
+   "Trustpilot": 5,
+   "Instagram": 1
+  },
+  "quotes": [
+   {
+    "text": "Veloce e con ampia gamma di scelta. Sono alle prime armi nel mondo degli integratori per lo sport Ho acquistato Whey isolate: mi ha colpita la ricchezza di gusti tra cui poter scegliere....",
+    "source": "Trustpilot",
+    "date": "2026-03-06",
+    "sentiment": "positive"
+   },
+   {
+    "text": "We Indians are waiting for myprotein all time evergreen popular vegan fermented BCAA 4:1:1 specially made in UK.",
+    "source": "Instagram",
+    "date": "2026-09-09",
+    "sentiment": "neutral"
+   }
+  ]
+ }
+]

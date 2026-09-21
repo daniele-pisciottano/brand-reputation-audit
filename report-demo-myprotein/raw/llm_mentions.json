@@ -1,0 +1,28 @@
+{
+ "collected_at":"2026-09-21","source":"DataForSEO ai_optimization llm_mentions, platform google (AI Overview), location Italy, language it",
+ "note":"Target: keyword partial_match + dominio ufficiale. Piattaforma chat_gpt non disponibile per Italy (errore 40501). Endpoint storici (history) non esposti dal server MCP collegato: nessuna serie mensile.",
+ "cross_agg":{"Myprotein":{"mentions":268,"ai_search_volume":117090},"Yamamoto":{"mentions":82,"ai_search_volume":45730},"Bulk":{"mentions":80,"ai_search_volume":21590},"Prozis":{"mentions":31,"ai_search_volume":6590},"Foodspring":{"mentions":0,"ai_search_volume":0}},
+ "cross_sources_for_myprotein":{"www.myprotein.it":268,"www.youtube.com":193,"www.my-personaltrainer.it":86,"www.instagram.com":57,"www.yamamotonutrition.com":14},
+ "top_domains_myprotein_keyword":[
+  {"domain":"www.myprotein.it","mentions":268,"ai_search_volume":117090},
+  {"domain":"www.youtube.com","mentions":252,"ai_search_volume":137580},
+  {"domain":"www.my-personaltrainer.it","mentions":108,"ai_search_volume":55800},
+  {"domain":"www.instagram.com","mentions":91,"ai_search_volume":39930},
+  {"domain":"www.projectinvictus.it","mentions":72,"ai_search_volume":31380},
+  {"domain":"www.facebook.com","mentions":60,"ai_search_volume":26280},
+  {"domain":"www.amazon.it","mentions":36,"ai_search_volume":10870},
+  {"domain":"www.darwin-nutrition.fr","mentions":32,"ai_search_volume":16540},
+  {"domain":"www.tiktok.com","mentions":32,"ai_search_volume":16490},
+  {"domain":"www.bestbody.it","mentions":28,"ai_search_volume":20480}],
+ "top_pages_myprotein_keyword":[
+  {"url":"https://www.myprotein.it/thezone/allenamento/esercizi-fianchi-donna/","mentions":18,"ai_search_volume":2710},
+  {"url":"https://drromanovaleria.ch/it/esigenze/corpo/fianchi/","mentions":15,"ai_search_volume":1860},
+  {"url":"https://www.bestbody.it/blogs/articoli/le-migliori-proteine-in-polvere","mentions":12,"ai_search_volume":8990},
+  {"url":"https://www.my-personaltrainer.it/integratori/migliori-proteine-vegetali-in-polvere.html","mentions":11,"ai_search_volume":15740},
+  {"url":"https://www.myprotein.it/thezone/allenamento/esercizi-pettorali-a-casa/","mentions":10,"ai_search_volume":8560},
+  {"url":"https://farmacialoreto.it/blog/quali-sono-le-migliori-proteine-in-polvere","mentions":10,"ai_search_volume":8490},
+  {"url":"https://www.melarossa.it/fitness/workout/come-dimagrire-i-fianchi/","mentions":10,"ai_search_volume":1830},
+  {"url":"https://www.pesoforma.com/blog/diete-e-benessere/dieta-dimagrire-pancia-e-fianchi/","mentions":9,"ai_search_volume":1260},
+  {"url":"https://www.buddyfit.club/mybuddy-it/6-esercizi-pettorali-a-corpo-libero-da-fare-a-casa","mentions":8,"ai_search_volume":5790},
+  {"url":"https://www.youtube.com/watch?v=unTtUIsO9JI&t=8","mentions":8,"ai_search_volume":940}]
+}
