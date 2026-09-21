@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Reputation Audit NutriPeak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------------------------------------------------------------------------
+   Palette e token. Per adattare il report ai colori di un cliente cambia solo
+   --accent e --accent-ink qui sotto, oppure passa meta.accent dentro data.json.
+   I colori delle serie (--s1..--s5) sono stati verificati per leggibilita' e
+   per distinguibilita' in caso di daltonismo, in chiaro e in scuro: se li
+   sostituisci, rivalidali invece di fidarti dell'occhio.
+   --------------------------------------------------------------------------- */
+:root{
+  --font: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --bg:#ffffff; --surface:#f4f5f6; --surface-2:#ffffff;
+  --ink:#191919; --muted:#595959; --faint:#8a8a8a; --border:#e2e4e7;
+  --accent:#e52217; --accent-ink:#ffffff;
+  --s1:#5781ff; --s2:#e52217; --s3:#118541; --s4:#551fc4; --s5:#db5e29;
+  --pos:#118541; --mix:#db5e29; --neu:#9a9a9a; --neg:#e52217; --unk:#c6c9cc;
+  --seq:#5781ff;
+  --good:#118541; --warning:#db5e29; --critical:#e52217;
+  --radius:10px; --maxw:1100px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#191919; --surface:#212121; --surface-2:#1e1e1e;
+    --ink:#f4f5f6; --muted:#b4b4b4; --faint:#8f8f8f; --border:#333333;
+    --s4:#7b4dd8; --neu:#8a8a8a; --unk:#5a5a5a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#191919; --surface:#212121; --surface-2:#1e1e1e;
+  --ink:#f4f5f6; --muted:#b4b4b4; --faint:#8f8f8f; --border:#333333;
+  --s4:#7b4dd8; --neu:#8a8a8a; --unk:#5a5a5a;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{
+  margin:0; background:var(--bg); color:var(--muted);
+  font-family:var(--font); font-size:15px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 16px}
+
+/* Tipografia */
+h1,h2,h3,h4{color:var(--ink); font-family:var(--font); margin:0}
+h1{font-size:30px; font-weight:600; line-height:1.2; letter-spacing:-.01em}
+h2{font-size:24px; font-weight:500; text-transform:uppercase; letter-spacing:.02em; line-height:1.25}
+h3{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink)}
+h4{font-size:15px; font-weight:600}
+p{margin:0 0 12px}
+a{color:var(--accent); text-underline-offset:2px}
+strong{font-weight:600; color:inherit}
+ul{margin:0 0 12px; padding-left:20px; list-style:disc}
+li{margin:4px 0}
+.lead{font-size:17px; line-height:1.55; color:var(--ink)}
+.small{font-size:13px}
+.faint{color:var(--faint)}
+
+/* Header */
+header.top{background:var(--surface); border-bottom:1px solid var(--border); padding:36px 0 30px}
+.brandline{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:6px}
+.eyebrow{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--accent)}
+.metarow{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px}
+.chip{
+  font-size:12px; padding:4px 10px; border-radius:999px;
+  background:var(--surface-2); border:1px solid var(--border); color:var(--muted); white-space:nowrap;
+}
+
+/* Nav */
+nav.toc{
+  position:sticky; top:0; z-index:20; background:var(--bg);
+  border-bottom:1px solid var(--border); padding:10px 0;
+}
+nav.toc .wrap{display:flex; gap:6px; overflow-x:auto; align-items:center; scrollbar-width:thin}
+nav.toc a{
+  font-size:12.5px; font-weight:500; color:var(--muted); text-decoration:none;
+  padding:6px 11px; border-radius:999px; white-space:nowrap; border:1px solid transparent;
+}
+nav.toc a:hover{background:var(--surface); color:var(--ink)}
+nav.toc a.on{background:var(--accent); color:var(--accent-ink)}
+.themeBtn{
+  margin-left:auto; flex:none; background:transparent; border:1px solid var(--border);
+  color:var(--muted); border-radius:999px; padding:5px 11px; font:inherit; font-size:12px; cursor:pointer;
+}
+
+/* Sezioni */
+section{padding:40px 0 8px; border-bottom:1px solid var(--border)}
+section:last-of-type{border-bottom:none}
+.shead{margin-bottom:18px}
+.shead p{margin:6px 0 0; max-width:70ch}
+
+/* Card e griglie */
+.grid{display:grid; gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.card{
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px;
+}
+.card.flat{background:transparent}
+
+/* KPI */
+.kpi .label{font-size:12px; text-transform:uppercase; letter-spacing:.05em; font-weight:600; color:var(--muted)}
+.kpi .value{font-size:34px; font-weight:600; color:var(--ink); line-height:1.1; margin:6px 0 2px; font-variant-numeric:tabular-nums}
+.kpi .note{font-size:12.5px; color:var(--faint)}
+.kpi.good .value{color:var(--good)} .kpi.warning .value{color:var(--warning)} .kpi.critical .value{color:var(--critical)}
+
+/* Grafici */
+.chartbox{margin-top:6px}
+.chartwrap{position:relative; height:300px}
+.chartwrap.tall{height:380px}
+.legend{display:flex; flex-wrap:wrap; gap:14px; margin:12px 0 0}
+.legend span{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted)}
+.legend i{width:11px; height:11px; border-radius:3px; display:inline-block; flex:none}
+details.data{margin-top:12px}
+details.data>summary{
+  cursor:pointer; font-size:12px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.05em; color:var(--faint); list-style:none; padding:4px 0;
+}
+details.data>summary::-webkit-details-marker{display:none}
+details.data>summary::before{content:"+ "; font-weight:700}
+details.data[open]>summary::before{content:"- "}
+
+/* Tabelle */
+table{width:100%; border-collapse:collapse; font-size:13.5px}
+th,td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top}
+th{font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--faint); font-weight:700; white-space:nowrap}
+td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+.scroll{overflow-x:auto}
+
+/* Badge */
+.badge{
+  display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.04em; padding:2px 8px; border-radius:999px; white-space:nowrap;
+  border:1px solid var(--border); color:var(--muted);
+}
+.badge.ok{color:var(--good); border-color:color-mix(in srgb, var(--good) 40%, transparent)}
+.badge.warn{color:var(--warning); border-color:color-mix(in srgb, var(--warning) 40%, transparent)}
+.badge.bad{color:var(--critical); border-color:color-mix(in srgb, var(--critical) 40%, transparent)}
+
+/* Citazioni */
+.quote{border-left:3px solid var(--border); padding:2px 0 2px 14px; margin:10px 0}
+.quote.pos{border-color:var(--pos)} .quote.neg{border-color:var(--neg)}
+.quote.mix{border-color:var(--mix)} .quote.neu{border-color:var(--neu)}
+.quote p{margin:0 0 4px; color:var(--ink); font-size:14.5px}
+.quote .src{font-size:12px; color:var(--faint)}
+
+/* Temi */
+.theme{padding:16px 0; border-bottom:1px solid var(--border)}
+.theme:last-child{border-bottom:none}
+.theme .head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+.theme .vol{font-size:13px; color:var(--faint); font-variant-numeric:tabular-nums}
+.bar{height:8px; border-radius:4px; background:var(--surface); overflow:hidden; display:flex; margin:10px 0 8px}
+.bar i{height:100%; display:block}
+.bar i+i{margin-left:2px}
+
+/* Nota interpretativa */
+.interp{
+  border-left:3px solid var(--accent); background:var(--surface);
+  padding:12px 16px; border-radius:0 var(--radius) var(--radius) 0; margin:16px 0;
+}
+.interp h3{margin-bottom:6px; color:var(--accent)}
+.interp p:last-child{margin-bottom:0}
+
+/* Raccomandazioni */
+.rec{display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--border)}
+.rec:last-child{border-bottom:none}
+.rec .n{
+  flex:none; width:28px; height:28px; border-radius:999px; background:var(--accent);
+  color:var(--accent-ink); display:grid; place-items:center; font-size:13px; font-weight:700;
+}
+.rec .body{flex:1; min-width:0}
+.rec h4{margin-bottom:4px}
+.rec .tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
+
+footer{padding:30px 0 44px; color:var(--faint); font-size:12.5px}
+.note{font-size:12.5px; color:var(--faint); margin-top:10px}
+
+@media print{
+  nav.toc,.themeBtn{display:none}
+  body{font-size:11pt}
+  section{break-inside:avoid; border-bottom:1px solid #ddd}
+  .card{break-inside:avoid}
+  details.data{display:none}
+}
+@media (max-width:640px){
+  h1{font-size:24px} h2{font-size:20px}
+  .kpi .value{font-size:27px}
+  .chartwrap{height:260px}
+}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <div class="brandline">
+    <span class="eyebrow">Brand Reputation Audit</span>
+  </div>
+  <h1 id="h-title">&nbsp;</h1>
+  <p class="lead" id="h-headline" style="margin-top:10px; max-width:72ch"></p>
+  <div class="metarow" id="h-meta"></div>
+</div></header>
+
+<nav class="toc"><div class="wrap" id="toc"></div></nav>
+
+<main class="wrap" id="main"></main>
+
+<footer class="wrap">
+  <p id="f-note"></p>
+  <p class="faint">Report generato con la skill <strong>brand-reputation-audit</strong>. I dati grezzi di ogni fonte
+  sono nella cartella <code>raw/</code> accanto a questo file, la metodologia completa in <code>METODOLOGIA.md</code>.</p>
+</footer>
+
+<script id="audit-data" type="application/json">{"meta":{"brand":"NutriPeak","domain":"nutripeak.example","market":"Italia","language":"it","depth":"standard","collected_at":"2026-09-21","period":{"from":"2025-09-01","to":"2026-09-15"},"competitors":["ProtoLab","FitSource","Vitaline","MuscleVia"],"questions":["Di cosa si lamenta davvero chi ha comprato, e su quali piattaforme","Il brand compare quando si cerca la categoria senza nominarlo","Quali fonti stanno costruendo la percezione del brand agli occhi degli LLM"],"author":"Dataset dimostrativo","accent":"#E52217"},"summary":{"headline":"DATASET DIMOSTRATIVO CON DATI INVENTATI, serve solo a far vedere come si presenta un report finito: NutriPeak non esiste e nessun numero in questa pagina descrive un brand reale.","bullets":["Su 1.800 contenuti raccolti da cinque piattaforme, il 40 per cento dei giudizi negativi si concentra su un tema solo, tempi e costi di spedizione, che pesa 412 contenuti.","I giudizi negativi sono passati dal 19 per cento di ottobre 2025 al 37 per cento di settembre 2026, e la salita comincia a marzo, quando compaiono i primi contenuti sul cambio di corriere.","Il brand viene nominato nel 47 per cento delle risposte generative su domande di categoria che non lo citano, contro il 73 per cento del primo concorrente.","Sei domini ricorrono sia nelle citazioni degli LLM sia negli AI Overview: su quattro di questi il brand è completamente assente.","Il rapporto qualità prezzo è l'aspetto più apprezzato dagli utenti, 214 contenuti positivi su 358, ma non compare fra i messaggi principali del sito.","Reddit e Trustpilot raccontano due brand diversi: su Trustpilot il tema dominante è la logistica, su Reddit la formulazione del prodotto."],"kpis":[{"label":"Contenuti analizzati","value":"1.800","note":"su 5 piattaforme, 12 mesi","tone":"neutral"},{"label":"Share of voice LLM","value":"47%","note":"su domande di categoria, contro 73% del primo","tone":"warning"},{"label":"Giudizi negativi","value":"34%","note":"era il 19 per cento a ottobre 2025","tone":"critical"},{"label":"Fonti chiave scoperte","value":"6","note":"il brand è assente su 4","tone":"critical"}]},"sources":[{"id":"trustpilot","name":"Trustpilot","items":480,"period":"ultimi 12 mesi","status":"ok","note":"Profilo del mercato italiano"},{"id":"reddit","name":"Reddit","items":620,"period":"ultimi 12 mesi","status":"ok","note":"Post e commenti, 4 subreddit di settore"},{"id":"youtube","name":"YouTube","items":340,"period":"ultimi 18 mesi","status":"ok","note":"Commenti sotto 12 video di recensione di terzi"},{"id":"tiktok","name":"TikTok","items":210,"period":"ultimi 12 mesi","status":"ok","note":"Commenti su hashtag di marca"},{"id":"instagram","name":"Instagram","items":150,"period":"ultimi 12 mesi","status":"partial","note":"Raccolta interrotta dai limiti della piattaforma"},{"id":"maps","name":"Google Maps","items":0,"period":"","status":"skipped","note":"Nessun punto vendita fisico: fonte esclusa in fase di perimetro"},{"id":"site","name":"Sito del brand","items":30,"period":"settembre 2026","status":"ok","note":"Pagine usate per il confronto fra racconto e percezione"}],"sentiment_by_source":[{"source":"Trustpilot","positive":198,"neutral":62,"negative":186,"mixed":28,"unclassified":6},{"source":"Reddit","positive":171,"neutral":204,"negative":182,"mixed":47,"unclassified":16},{"source":"YouTube","positive":96,"neutral":118,"negative":88,"mixed":29,"unclassified":9},{"source":"TikTok","positive":74,"neutral":68,"negative":44,"mixed":18,"unclassified":6},{"source":"Instagram","positive":61,"neutral":49,"negative":27,"mixed":9,"unclassified":4}],"volume_over_time":{"unit":"month","points":[{"date":"2025-10","by_source":{"Trustpilot":31,"Reddit":42,"YouTube":19,"TikTok":12,"Instagram":9}},{"date":"2025-11","by_source":{"Trustpilot":58,"Reddit":61,"YouTube":27,"TikTok":14,"Instagram":14}},{"date":"2025-12","by_source":{"Trustpilot":44,"Reddit":49,"YouTube":22,"TikTok":18,"Instagram":11}},{"date":"2026-01","by_source":{"Trustpilot":39,"Reddit":55,"YouTube":31,"TikTok":21,"Instagram":13}},{"date":"2026-02","by_source":{"Trustpilot":33,"Reddit":47,"YouTube":24,"TikTok":16,"Instagram":12}},{"date":"2026-03","by_source":{"Trustpilot":47,"Reddit":52,"YouTube":29,"TikTok":19,"Instagram":15}},{"date":"2026-04","by_source":{"Trustpilot":41,"Reddit":44,"YouTube":26,"TikTok":17,"Instagram":11}},{"date":"2026-05","by_source":{"Trustpilot":36,"Reddit":51,"YouTube":33,"TikTok":22,"Instagram":14}},{"date":"2026-06","by_source":{"Trustpilot":52,"Reddit":58,"YouTube":28,"TikTok":20,"Instagram":16}},{"date":"2026-07","by_source":{"Trustpilot":38,"Reddit":63,"YouTube":35,"TikTok":13,"Instagram":13}},{"date":"2026-08","by_source":{"Trustpilot":34,"Reddit":48,"YouTube":31,"TikTok":18,"Instagram":12}},{"date":"2026-09","by_source":{"Trustpilot":27,"Reddit":50,"YouTube":35,"TikTok":20,"Instagram":10}}]},"themes":[{"name":"TEMPI E COSTI DI SPEDIZIONE","definition":"Attese oltre la data promessa, costi di consegna percepiti come poco chiari, pacchi consegnati incompleti.","volume":412,"share":0.229,"sentiment":{"positive":38,"neutral":61,"negative":289,"mixed":21,"unclassified":3},"by_source":{"Trustpilot":238,"Reddit":104,"YouTube":41,"TikTok":19,"Instagram":10},"quotes":[{"text":"Ordinato il 3, consegna promessa in 48 ore, arrivato dopo nove giorni senza uno straccio di avviso.","source":"Trustpilot","date":"2026-04-11","sentiment":"negative"},{"text":"Il prodotto è ottimo, è la logistica che rovina tutto. Alla terza volta ho cambiato fornitore.","source":"Reddit","date":"2026-06-02","sentiment":"mixed"}]},{"name":"RAPPORTO QUALITÀ PREZZO","definition":"Giudizi sul prezzo in rapporto alla quantità e alla composizione dichiarata, confronti con i concorrenti.","volume":358,"share":0.199,"sentiment":{"positive":214,"neutral":58,"negative":61,"mixed":22,"unclassified":3},"by_source":{"Trustpilot":96,"Reddit":168,"YouTube":61,"TikTok":22,"Instagram":11},"quotes":[{"text":"A parità di grammatura costa un terzo in meno degli altri, e la composizione regge il confronto.","source":"Reddit","date":"2026-02-19","sentiment":"positive"}]},{"name":"GUSTI E SOLUBILITÀ","definition":"Valutazioni sul sapore, sulla dolcezza percepita e su quanto il prodotto si scioglie.","volume":296,"share":0.164,"sentiment":{"positive":118,"neutral":47,"negative":104,"mixed":24,"unclassified":3},"by_source":{"Trustpilot":71,"Reddit":112,"YouTube":68,"TikTok":33,"Instagram":12},"quotes":[{"text":"Metà dei gusti sono ottimi, l'altra metà immangiabile. Serve leggersi le recensioni prima di ordinare.","source":"YouTube","date":"2026-05-27","sentiment":"mixed"}]},{"name":"SCONTI E TRASPARENZA DEI PREZZI","definition":"Percezione della promozione permanente, sfiducia verso il prezzo pieno di listino.","volume":244,"share":0.136,"sentiment":{"positive":71,"neutral":66,"negative":87,"mixed":17,"unclassified":3},"by_source":{"Trustpilot":54,"Reddit":121,"YouTube":39,"TikTok":21,"Instagram":9},"quotes":[{"text":"Il prezzo pieno non lo ha mai pagato nessuno, c'è sempre un codice attivo. A quel punto tanto vale scriverlo.","source":"Reddit","date":"2026-03-08","sentiment":"negative"}]},{"name":"ASSISTENZA CLIENTI","definition":"Tempi e qualità delle risposte del servizio clienti, gestione di resi e rimborsi.","volume":187,"share":0.104,"sentiment":{"positive":29,"neutral":34,"negative":112,"mixed":9,"unclassified":3},"by_source":{"Trustpilot":121,"Reddit":43,"YouTube":12,"TikTok":7,"Instagram":4},"quotes":[{"text":"Tre mail in due settimane, risposte automatiche ogni volta. Ho risolto solo scrivendo pubblicamente.","source":"Trustpilot","date":"2026-07-14","sentiment":"negative"}]},{"name":"QUALITÀ E CERTIFICAZIONI","definition":"Domande su analisi di laboratorio, origine delle materie prime e certificazioni dichiarate.","volume":163,"share":0.091,"sentiment":{"positive":74,"neutral":48,"negative":33,"mixed":6,"unclassified":2},"by_source":{"Trustpilot":22,"Reddit":94,"YouTube":34,"TikTok":9,"Instagram":4},"quotes":[{"text":"Sono fra i pochi che pubblicano le analisi per lotto, e questo per me vale più di qualunque recensione.","source":"Reddit","date":"2026-01-22","sentiment":"positive"}]},{"name":"CONFEZIONE E SOSTENIBILITÀ","definition":"Imballaggio, quantità di plastica, richiudibilità delle confezioni.","volume":96,"share":0.053,"sentiment":{"positive":31,"neutral":27,"negative":32,"mixed":4,"unclassified":2},"by_source":{"Trustpilot":28,"Reddit":31,"YouTube":18,"TikTok":13,"Instagram":6},"quotes":[{"text":"La busta non si richiude più dopo la prima apertura, un dettaglio che si nota tutti i giorni.","source":"TikTok","date":"2026-08-05","sentiment":"negative"}]}],"llm":{"models":["modello-a","modello-b"],"runs_per_prompt":3,"share_of_voice":[{"entity":"NutriPeak","mentions":14,"runs":30,"share":0.47,"avg_position":3.2,"is_brand":true},{"entity":"ProtoLab","mentions":22,"runs":30,"share":0.73,"avg_position":1.9},{"entity":"Vitaline","mentions":18,"runs":30,"share":0.6,"avg_position":2.6},{"entity":"FitSource","mentions":16,"runs":30,"share":0.53,"avg_position":2.4},{"entity":"MuscleVia","mentions":9,"runs":30,"share":0.3,"avg_position":4.1}],"by_family":[{"family":"Scoperta senza brand","brand_share":0.43,"runs":21},{"family":"Confronto senza brand","brand_share":0.56,"runs":9},{"family":"Conoscenza del brand","brand_share":1.0,"runs":15},{"family":"Fiducia e obiezioni","brand_share":1.0,"runs":15},{"family":"Confronto con brand","brand_share":1.0,"runs":15}],"facts":[{"claim":"Spedizione gratuita sopra i 25 euro","verdict":"obsoleto","reality":"La soglia sul sito è 45 euro da marzo 2026","source_guess":"guidaintegratori.example","prompt":"nutripeak spedizioni e costi"},{"claim":"Il marchio produce direttamente in Italia","verdict":"errato","reality":"Il sito dichiara produzione in due stabilimenti esteri","source_guess":"forum di settore","prompt":"chi produce nutripeak"},{"claim":"La linea vegetale è disponibile in tre gusti","verdict":"impreciso","reality":"I gusti a catalogo sono sei","source_guess":"recensione del 2024","prompt":"nutripeak linea vegetale"}],"objections":[{"text":"Consegne più lente di quanto promesso in fase di acquisto","frequency":9,"cited_sources":["trustpilot.com","reddit.com"]},{"text":"Sconti permanenti che rendono poco credibile il prezzo di listino","frequency":6,"cited_sources":["reddit.com","guidaintegratori.example"]},{"text":"Servizio clienti lento nella gestione dei resi","frequency":5,"cited_sources":["trustpilot.com"]},{"text":"Qualità dei gusti disomogenea fra le referenze","frequency":4,"cited_sources":["reddit.com","youtube.com"]}]},"sources_map":[{"domain":"reddit.com","llm_citations":21,"aio_citations":6,"serp_positions":8,"total":35,"brand_status":"parziale","note":"Molte citazioni, nessun presidio ufficiale"},{"domain":"trustpilot.com","llm_citations":17,"aio_citations":4,"serp_positions":7,"total":28,"brand_status":"presente","note":"Profilo attivo, risposte poco frequenti"},{"domain":"guidaintegratori.example","llm_citations":14,"aio_citations":5,"serp_positions":6,"total":25,"brand_status":"assente","note":"Cita sistematicamente tre concorrenti"},{"domain":"youtube.com","llm_citations":9,"aio_citations":3,"serp_positions":5,"total":17,"brand_status":"parziale","note":"Canale del brand poco attivo"},{"domain":"sportenutrizione.example","llm_citations":8,"aio_citations":4,"serp_positions":4,"total":16,"brand_status":"assente","note":"Comparatore molto citato nelle risposte"},{"domain":"rivistafitness.example","llm_citations":6,"aio_citations":3,"serp_positions":3,"total":12,"brand_status":"assente","note":"Recensioni approfondite di categoria"},{"domain":"amazon.it","llm_citations":5,"aio_citations":1,"serp_positions":4,"total":10,"brand_status":"presente","note":"Schede prodotto incomplete"},{"domain":"benesserequotidiano.example","llm_citations":4,"aio_citations":2,"serp_positions":2,"total":8,"brand_status":"assente","note":""}],"gap":[{"promise":"Consegna in 48 ore in tutta Italia","verdict":"contraddetta","evidence":"289 contenuti negativi sul tema spedizione, primo motivo di insoddisfazione","items":412},{"promise":"Prezzo trasparente, senza sorprese","verdict":"contraddetta","evidence":"87 contenuti negativi sulla promozione permanente e sul prezzo di listino","items":244},{"promise":"Analisi di laboratorio pubblicate per ogni lotto","verdict":"confermata","evidence":"74 contenuti positivi, tema citato spontaneamente come elemento di fiducia","items":163},{"promise":"Formulazioni sviluppate con nutrizionisti","verdict":"assente","evidence":"Nessun contenuto rilevante cita questo aspetto","items":0},{"promise":"Nessuna","verdict":"non_rivendicata","evidence":"Il rapporto qualità prezzo è l'elemento più apprezzato, 214 contenuti positivi, ma non compare fra i messaggi del sito","items":358}],"competitors":[{"name":"NutriPeak","sov":0.47,"sentiment_negative":0.34,"review_volume":480,"note":"Il brand analizzato"},{"name":"ProtoLab","sov":0.73,"sentiment_negative":0.21,"review_volume":1240,"note":"Primo per share of voice e per volume di recensioni"},{"name":"Vitaline","sov":0.6,"sentiment_negative":0.29,"review_volume":860,"note":"Stessi problemi di logistica: tema di categoria"},{"name":"FitSource","sov":0.53,"sentiment_negative":0.26,"review_volume":690,"note":""},{"name":"MuscleVia","sov":0.3,"sentiment_negative":0.38,"review_volume":410,"note":""}],"recommendations":[{"title":"Pubblicare una pagina sui tempi e i costi reali di spedizione","evidence":"412 contenuti sul tema, 289 negativi, ed è la prima obiezione riportata anche dai modelli","lever":"Contenuti","impact":"alto","effort":"basso","horizon":"30 giorni"},{"title":"Rivendicare il rapporto qualità prezzo nei messaggi principali","evidence":"214 contenuti positivi su un aspetto che il sito non menziona mai","lever":"Contenuti","impact":"alto","effort":"basso","horizon":"30 giorni"},{"title":"Aprire un presidio dichiarato sui quattro subreddit di settore","evidence":"Reddit è la fonte più citata dagli LLM con 21 citazioni, senza nessuna presenza ufficiale","lever":"Presidio piattaforme","impact":"alto","effort":"medio","horizon":"90 giorni"},{"title":"Farsi includere nei tre comparatori assenti dalla mappa fonti","evidence":"guidaintegratori, sportenutrizione e rivistafitness valgono 53 citazioni complessive, il brand non compare in nessuno","lever":"Digital PR","impact":"alto","effort":"medio","horizon":"90 giorni"},{"title":"Allineare le informazioni pubbliche su soglia di spedizione e produzione","evidence":"Due affermazioni su tre verificate nelle risposte dei modelli sono obsolete o errate","lever":"Contenuti","impact":"medio","effort":"basso","horizon":"30 giorni"},{"title":"Portare a 24 ore il tempo di prima risposta dell'assistenza","evidence":"112 contenuti negativi su 187 riguardano i tempi di risposta","lever":"Servizio clienti","impact":"medio","effort":"alto","horizon":"180 giorni"}],"methodology":{"notes":["Contenuti pubblici raccolti tramite attori Apify a consumo, un file grezzo per fonte nella cartella raw.","SERP, AI Overview e risposte generative raccolte tramite DataForSEO, mercato italiano, lingua italiana.","Ogni prompt eseguito tre volte su due modelli: i valori sono frequenze di menzione, non presenza o assenza.","Sentiment classificato nella lingua originale del contenuto, con una quarta categoria per i giudizi misti.","Temi emersi dalla lettura di un campione trasversale di 140 contenuti, poi applicati all'intero insieme.","Finestra temporale: 12 mesi con granularità mensile, concordata in fase di briefing.","Trascrizioni dei 15 video di terzi più visti, analizzate per occorrenza del nome del brand e non per video intero."],"limits":["DATASET DIMOSTRATIVO: i dati di questo file sono inventati e NutriPeak è un brand di fantasia.","Il campione non è probabilistico: chi scrive recensioni e commenti è autoselezionato e più polarizzato della base clienti.","Instagram ha reso 150 contenuti sui 200 previsti, quindi pesa meno delle altre fonti nei confronti.","Google Maps è stata esclusa in fase di perimetro perché il brand non ha punti vendita fisici.","Le risposte dei modelli cambiano nel tempo: la rilevazione vale per la data indicata e va ripetuta per essere confrontata.","Il 3 per cento dei contenuti è rimasto non classificabile per ironia o ambiguita' e non è stato redistribuito.","Settembre 2026 non è concluso alla data di raccolta: l'ultimo punto delle serie temporali è parziale e non va letto come un calo.","Alcune trascrizioni sono automatiche e possono sbagliare i nomi propri: i passaggi citati sono stati ricontrollati sul video."],"failed_sources":[{"source":"Instagram","reason":"Raccolta interrotta dai limiti della piattaforma a 150 contenuti su 200"}],"calls":{"dataforseo":232,"apify_runs":11},"cost_estimate":"circa 6 dollari di crediti Apify più il consumo DataForSEO","cap":{"requested":2000,"collected":1800,"note":"Tetto concordato in fase di briefing, non superato. Instagram ha chiuso sotto il previsto."}},"timeline":{"unit":"month","narrative":"A ottobre 2025 i giudizi negativi erano il 19 per cento dei contenuti del periodo, a settembre 2026 sono il 37 per cento, e quasi tutta la crescita si concentra su due temi: la spedizione, salita dal 17 al 26 per cento dei contenuti, e la trasparenza dei prezzi, che parte dal 9 per cento e raddoppia. Il rapporto qualità prezzo resta l'aspetto più apprezzato ma perde peso, dal 24 al 18 per cento, segno che l'argomento che teneva in piedi la reputazione sta cedendo spazio ai problemi. Il picco di novembre 2025 è un evento isolato legato alla campagna di sconti e il mese dopo il volume rientra, mentre la salita che comincia a marzo 2026 è una tendenza vera, perché si mantiene su sei periodi consecutivi. Sul fronte generativo il brand cresce in valore assoluto, da 86 a 124 menzioni mensili, ma il primo concorrente cresce più in fretta, quindi la distanza relativa aumenta invece di ridursi.","sentiment":[{"positive":47,"neutral":33,"negative":22,"mixed":8,"unclassified":3,"date":"2025-10","total":113,"sparse":false},{"positive":69,"neutral":52,"negative":37,"mixed":13,"unclassified":3,"date":"2025-11","total":174,"sparse":false},{"positive":53,"neutral":43,"negative":35,"mixed":10,"unclassified":3,"date":"2025-12","total":144,"sparse":false},{"positive":57,"neutral":46,"negative":41,"mixed":11,"unclassified":4,"date":"2026-01","total":159,"sparse":false},{"positive":46,"neutral":36,"negative":37,"mixed":10,"unclassified":3,"date":"2026-02","total":132,"sparse":false},{"positive":52,"neutral":43,"negative":51,"mixed":12,"unclassified":4,"date":"2026-03","total":162,"sparse":false},{"positive":47,"neutral":39,"negative":40,"mixed":10,"unclassified":3,"date":"2026-04","total":139,"sparse":false},{"positive":50,"neutral":43,"negative":48,"mixed":11,"unclassified":4,"date":"2026-05","total":156,"sparse":false},{"positive":52,"neutral":47,"negative":58,"mixed":13,"unclassified":4,"date":"2026-06","total":174,"sparse":false},{"positive":46,"neutral":43,"negative":57,"mixed":12,"unclassified":4,"date":"2026-07","total":162,"sparse":false},{"positive":42,"neutral":38,"negative":49,"mixed":11,"unclassified":3,"date":"2026-08","total":143,"sparse":false},{"positive":39,"neutral":38,"negative":52,"mixed":10,"unclassified":3,"date":"2026-09","total":142,"sparse":false}],"themes":[{"name":"TEMPI E COSTI DI SPEDIZIONE","points":[{"date":"2025-10","volume":19,"share":0.17},{"date":"2025-11","volume":31,"share":0.18},{"date":"2025-12","volume":29,"share":0.2},{"date":"2026-01","volume":33,"share":0.21},{"date":"2026-02","volume":29,"share":0.22},{"date":"2026-03","volume":42,"share":0.26},{"date":"2026-04","volume":32,"share":0.23},{"date":"2026-05","volume":37,"share":0.24},{"date":"2026-06","volume":45,"share":0.26},{"date":"2026-07","volume":44,"share":0.27},{"date":"2026-08","volume":36,"share":0.25},{"date":"2026-09","volume":37,"share":0.26}]},{"name":"RAPPORTO QUALITÀ PREZZO","points":[{"date":"2025-10","volume":27,"share":0.24},{"date":"2025-11","volume":40,"share":0.23},{"date":"2025-12","volume":32,"share":0.22},{"date":"2026-01","volume":33,"share":0.21},{"date":"2026-02","volume":26,"share":0.2},{"date":"2026-03","volume":31,"share":0.19},{"date":"2026-04","volume":28,"share":0.2},{"date":"2026-05","volume":30,"share":0.19},{"date":"2026-06","volume":31,"share":0.18},{"date":"2026-07","volume":29,"share":0.18},{"date":"2026-08","volume":27,"share":0.19},{"date":"2026-09","volume":26,"share":0.18}]},{"name":"GUSTI E SOLUBILITÀ","points":[{"date":"2025-10","volume":20,"share":0.18},{"date":"2025-11","volume":30,"share":0.17},{"date":"2025-12","volume":24,"share":0.17},{"date":"2026-01","volume":25,"share":0.16},{"date":"2026-02","volume":21,"share":0.16},{"date":"2026-03","volume":26,"share":0.16},{"date":"2026-04","volume":22,"share":0.16},{"date":"2026-05","volume":25,"share":0.16},{"date":"2026-06","volume":28,"share":0.16},{"date":"2026-07","volume":26,"share":0.16},{"date":"2026-08","volume":23,"share":0.16},{"date":"2026-09","volume":23,"share":0.16}]},{"name":"SCONTI E TRASPARENZA DEI PREZZI","points":[{"date":"2025-10","volume":10,"share":0.09},{"date":"2025-11","volume":17,"share":0.1},{"date":"2025-12","volume":16,"share":0.11},{"date":"2026-01","volume":19,"share":0.12},{"date":"2026-02","volume":17,"share":0.13},{"date":"2026-03","volume":23,"share":0.14},{"date":"2026-04","volume":19,"share":0.14},{"date":"2026-05","volume":23,"share":0.15},{"date":"2026-06","volume":28,"share":0.16},{"date":"2026-07","volume":28,"share":0.17},{"date":"2026-08","volume":24,"share":0.17},{"date":"2026-09","volume":26,"share":0.18}]},{"name":"ASSISTENZA CLIENTI","points":[{"date":"2025-10","volume":14,"share":0.12},{"date":"2025-11","volume":21,"share":0.12},{"date":"2025-12","volume":16,"share":0.11},{"date":"2026-01","volume":17,"share":0.11},{"date":"2026-02","volume":13,"share":0.1},{"date":"2026-03","volume":16,"share":0.1},{"date":"2026-04","volume":14,"share":0.1},{"date":"2026-05","volume":16,"share":0.1},{"date":"2026-06","volume":17,"share":0.1},{"date":"2026-07","volume":16,"share":0.1},{"date":"2026-08","volume":14,"share":0.1},{"date":"2026-09","volume":14,"share":0.1}]}],"milestones":[{"date":"2025-11","kind":"picco","label":"Campagna sconti di novembre","explanation":"Volume più che raddoppiato in un mese, trainato dalle recensioni sulla promozione. Evento isolato, il mese successivo rientra sui valori precedenti."},{"date":"2026-03","kind":"svolta","label":"Inizio della crescita dei negativi sulla spedizione","explanation":"Da qui la quota di negativi non torna più sotto il 30 per cento per sei periodi consecutivi. Coincide con i primi contenuti che citano il cambio di corriere."},{"date":"2026-07","kind":"evento","label":"Video di recensione molto visto","explanation":"Un canale di settore pubblica un confronto che porta il picco di volume su YouTube e Reddit nello stesso mese."},{"date":"2026-09","kind":"artefatto","label":"Periodo ancora in corso","explanation":"Il mese non è concluso alla data di raccolta: il calo di volume è un effetto della finestra, non un calo di interesse."}],"llm_visibility":{"metric":"menzioni mensili","note":"Serie storica presa dall'archivio delle menzioni generative, non dai prompt eseguiti per questo audit.","points":[{"date":"2025-10","by_entity":{"NutriPeak":86,"ProtoLab":190,"Vitaline":148,"FitSource":121,"MuscleVia":62}},{"date":"2025-11","by_entity":{"NutriPeak":92,"ProtoLab":201,"Vitaline":152,"FitSource":126,"MuscleVia":64}},{"date":"2025-12","by_entity":{"NutriPeak":90,"ProtoLab":208,"Vitaline":149,"FitSource":124,"MuscleVia":61}},{"date":"2026-01","by_entity":{"NutriPeak":97,"ProtoLab":214,"Vitaline":157,"FitSource":131,"MuscleVia":66}},{"date":"2026-02","by_entity":{"NutriPeak":101,"ProtoLab":222,"Vitaline":161,"FitSource":134,"MuscleVia":68}},{"date":"2026-03","by_entity":{"NutriPeak":108,"ProtoLab":231,"Vitaline":166,"FitSource":139,"MuscleVia":71}},{"date":"2026-04","by_entity":{"NutriPeak":104,"ProtoLab":238,"Vitaline":163,"FitSource":137,"MuscleVia":69}},{"date":"2026-05","by_entity":{"NutriPeak":112,"ProtoLab":244,"Vitaline":171,"FitSource":142,"MuscleVia":72}},{"date":"2026-06","by_entity":{"NutriPeak":118,"ProtoLab":251,"Vitaline":176,"FitSource":147,"MuscleVia":74}},{"date":"2026-07","by_entity":{"NutriPeak":121,"ProtoLab":258,"Vitaline":181,"FitSource":151,"MuscleVia":77}},{"date":"2026-08","by_entity":{"NutriPeak":117,"ProtoLab":262,"Vitaline":178,"FitSource":149,"MuscleVia":75}},{"date":"2026-09","by_entity":{"NutriPeak":124,"ProtoLab":271,"Vitaline":184,"FitSource":154,"MuscleVia":78}}]}},"video_mentions":{"videos_analysed":15,"occurrences":42,"note":"Trascrizioni dei 15 video di canali terzi più visti che nominano il brand, scelti per visualizzazioni e non per data. I video del canale del brand sono esclusi. Per ogni occorrenza è stata estratta una finestra di circa trenta secondi intorno alla citazione.","items":[{"video_title":"Ho provato sei marche di proteine per tre mesi","channel":"Palestra Senza Filtri","url":"https://www.youtube.example/watch?v=demo1","views":418000,"published":"2026-04-22","role":"confronto","timestamp":"11:48","quote":"Sul prezzo NutriPeak vince, non c'è discussione. Il problema è che l'ordine mi è arrivato dopo dieci giorni e quando ho scritto all'assistenza non mi ha risposto nessuno per una settimana.","sentiment":"mixed","theme":"TEMPI E COSTI DI SPEDIZIONE","divergence":"Nei commenti sotto lo stesso video la spedizione viene citata come problema 38 volte, molto più di quanto pesi nel video."},{"video_title":"Le migliori proteine in polvere qualità prezzo del 2026","channel":"Nutrizione Pratica","url":"https://www.youtube.example/watch?v=demo2","views":263000,"published":"2026-02-09","role":"soggetto","timestamp":"03:05","quote":"Pubblicano le analisi per ogni lotto ed è una cosa che quasi nessuno fa in questa fascia di prezzo. Per me questo da solo vale la scelta.","sentiment":"positive","theme":"QUALITÀ E CERTIFICAZIONI"},{"video_title":"Perché ho smesso di comprare integratori online","channel":"Fitness Onesto","url":"https://www.youtube.example/watch?v=demo3","views":197000,"published":"2026-07-03","role":"citazione","timestamp":"06:31","quote":"Prendi NutriPeak: il prezzo pieno non lo paga mai nessuno perché c'è sempre un codice attivo. A quel punto il listino cosa serve a fare?","sentiment":"negative","theme":"SCONTI E TRASPARENZA DEI PREZZI"},{"video_title":"Test alla cieca sui gusti: 12 proteine a confronto","channel":"Cucina e Muscoli","url":"https://www.youtube.example/watch?v=demo4","views":142000,"published":"2026-05-27","role":"confronto","timestamp":"14:20","quote":"Il cioccolato è fra i migliori del test, la vaniglia invece l'abbiamo bocciata in quattro su cinque. Con questo marchio è proprio una lotteria.","sentiment":"mixed","theme":"GUSTI E SOLUBILITÀ"},{"video_title":"Quanto costa davvero mettere su massa nel 2026","channel":"Numeri e Bilanciere","url":"https://www.youtube.example/watch?v=demo5","views":88000,"published":"2026-06-18","role":"citazione","timestamp":"09:02","quote":"A parità di grammatura risparmi circa un terzo rispetto ai marchi più blasonati, e sulla carta la composizione regge.","sentiment":"positive","theme":"RAPPORTO QUALITÀ PREZZO"}]}}</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+var D = {};
+try { D = JSON.parse(document.getElementById('audit-data').textContent) || {}; }
+catch(e){ document.getElementById('main').innerHTML = '<section><h2>Dati non leggibili</h2><p>Il blocco dati di questo report non è un JSON valido.</p></section>'; return; }
+
+var meta = D.meta || {};
+var css  = getComputedStyle(document.documentElement);
+function tok(n){ return (css.getPropertyValue(n)||'').trim(); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function num(n){ return (n==null||isNaN(n)) ? '' : Number(n).toLocaleString('it-IT'); }
+function pct(x,d){ return (x==null||isNaN(x)) ? '' : (Number(x)*100).toFixed(d==null?0:d).replace('.',',')+'%'; }
+function has(a){ return Array.isArray(a) ? a.length>0 : (a && Object.keys(a).length>0); }
+
+if (meta.accent){
+  document.documentElement.style.setProperty('--accent', meta.accent);
+}
+
+/* ---------- Palette delle serie: ordine fisso, mai ciclato ---------- */
+var SERIES_TOKENS = ['--s1','--s2','--s3','--s4','--s5'];
+function series(){ return SERIES_TOKENS.map(tok); }
+/* Nelle legende in HTML passiamo la variabile CSS e non il valore risolto,
+   cosi' i quadratini seguono il cambio di tema senza ridisegnare la pagina. */
+function cssv(n){ return 'var('+n+')'; }
+var SENT = [
+  {k:'positive',    l:'Positivo',       v:'--pos'},
+  {k:'mixed',       l:'Misto',          v:'--mix'},
+  {k:'neutral',     l:'Neutro',         v:'--neu'},
+  {k:'negative',    l:'Negativo',       v:'--neg'},
+  {k:'unclassified',l:'Non classificato',v:'--unk'}
+];
+
+/* ---------- Header ---------- */
+document.getElementById('h-title').textContent = (meta.brand||'Brand') + (meta.market? ' · '+meta.market : '');
+document.title = 'Brand Reputation Audit ' + (meta.brand||'');
+if (D.summary && D.summary.headline) document.getElementById('h-headline').textContent = D.summary.headline;
+
+var chips = [];
+if (meta.collected_at) chips.push('Raccolta dati: '+meta.collected_at);
+if (meta.period && (meta.period.from||meta.period.to)) chips.push('Periodo: '+(meta.period.from||'?')+' – '+(meta.period.to||'?'));
+if (meta.depth) chips.push('Profondità: '+meta.depth);
+if (meta.domain) chips.push(meta.domain);
+if (has(meta.competitors)) chips.push('Confronto: '+meta.competitors.join(', '));
+if (meta.author) chips.push('A cura di '+meta.author);
+document.getElementById('h-meta').innerHTML = chips.map(function(c){ return '<span class="chip">'+esc(c)+'</span>'; }).join('');
+document.getElementById('f-note').textContent =
+  'Le risposte degli LLM e le SERP cambiano nel tempo. Le rilevazioni di questo report si riferiscono al '
+  + (meta.collected_at||'giorno della raccolta') + ' e vanno considerate datate.';
+
+/* ---------- Helper di rendering ---------- */
+var sections = [];
+function S(id,title,sub,html){
+  if (!html) return;
+  sections.push({id:id,title:title});
+  var el = document.createElement('section');
+  el.id = id;
+  el.innerHTML = '<div class="shead"><h2>'+esc(title)+'</h2>'+(sub?'<p>'+esc(sub)+'</p>':'')+'</div>'+html;
+  document.getElementById('main').appendChild(el);
+}
+function table(cols, rows){
+  if (!rows.length) return '';
+  var h = cols.map(function(c){ return '<th'+(c.num?' class="num"':'')+'>'+esc(c.t)+'</th>'; }).join('');
+  var b = rows.map(function(r){
+    return '<tr>'+cols.map(function(c,i){
+      return '<td'+(c.num?' class="num"':'')+'>'+(r[i]==null?'':r[i])+'</td>';
+    }).join('')+'</tr>';
+  }).join('');
+  return '<div class="scroll"><table><thead><tr>'+h+'</tr></thead><tbody>'+b+'</tbody></table></div>';
+}
+function dataTable(cols, rows){
+  if (!rows.length) return '';
+  return '<details class="data"><summary>Vedi i dati del grafico</summary>'+table(cols,rows)+'</details>';
+}
+function legend(items){
+  return '<div class="legend">'+items.map(function(it){
+    return '<span><i style="background:'+it.c+'"></i>'+esc(it.l)+'</span>';
+  }).join('')+'</div>';
+}
+function canvas(id, tall){ return '<div class="chartwrap'+(tall?' tall':'')+'"><canvas id="'+id+'"></canvas></div>'; }
+
+var charts = [];
+function draw(id, cfg){
+  if (typeof Chart === 'undefined') return;
+  var el = document.getElementById(id); if (!el) return;
+  var grid = tok('--border'), ink = tok('--muted'), surf = tok('--surface-2');
+  /* La legenda la disegniamo noi in HTML, cosi' resta leggibile anche in stampa e
+     quando Chart.js non si carica. Il merge su plugins deve essere per chiave,
+     altrimenti un grafico che passa solo tooltip si riporta in casa la legenda
+     predefinita di Chart.js e ne mostra due. */
+  var base = {
+    legend:{display:false},
+    tooltip:{
+      backgroundColor:tok('--ink'), titleColor:tok('--bg'), bodyColor:tok('--bg'),
+      padding:10, cornerRadius:6, displayColors:true, boxPadding:4,
+      titleFont:{family:tok('--font'),size:12,weight:'600'},
+      bodyFont:{family:tok('--font'),size:12}
+    }
+  };
+  var given = (cfg.options && cfg.options.plugins) || {};
+  cfg.options = Object.assign({
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index', intersect:false}
+  }, cfg.options||{});
+  cfg.options.plugins = {
+    legend: Object.assign({}, base.legend, given.legend||{}),
+    tooltip: Object.assign({}, base.tooltip, given.tooltip||{})
+  };
+  cfg.options.scales = cfg.options.scales || {};
+  Object.keys(cfg.options.scales).forEach(function(k){
+    var s = cfg.options.scales[k];
+    s.grid = Object.assign({color:grid, drawTicks:false, drawBorder:false}, s.grid||{});
+    s.border = {display:false};
+    s.ticks = Object.assign({color:ink, font:{family:tok('--font'),size:11.5}, padding:6}, s.ticks||{});
+  });
+  (cfg.data.datasets||[]).forEach(function(d){
+    if (cfg.type==='bar'){
+      d.borderRadius = d.borderRadius==null ? 4 : d.borderRadius;
+      d.borderSkipped = false;
+      if (d.borderWidth==null){ d.borderWidth = 2; d.borderColor = surf; }
+    }
+    if (cfg.type==='line'){
+      d.borderWidth = 2; d.tension = .25; d.pointRadius = 3; d.pointHoverRadius = 6;
+      d.pointBorderColor = surf; d.pointBorderWidth = 2;
+    }
+  });
+  try { charts.push(new Chart(el.getContext('2d'), cfg)); } catch(e){}
+}
+
+/* ===================== 1. In sintesi ===================== */
+(function(){
+  var s = D.summary; if (!s) return;
+  var h = '';
+  if (has(s.kpis)){
+    h += '<div class="grid g4">'+s.kpis.map(function(k){
+      return '<div class="card kpi '+esc(k.tone||'neutral')+'">'
+        + '<div class="label">'+esc(k.label||'')+'</div>'
+        + '<div class="value">'+esc(k.value==null?'':k.value)+'</div>'
+        + (k.note?'<div class="note">'+esc(k.note)+'</div>':'')+'</div>';
+    }).join('')+'</div>';
+  }
+  if (has(s.bullets)){
+    h += '<div class="card flat" style="padding-left:0"><h3 style="margin:22px 0 10px">Cosa emerge</h3><ul>'
+      + s.bullets.map(function(b){ return '<li>'+esc(b)+'</li>'; }).join('')+'</ul></div>';
+  }
+  if (has(meta.questions)){
+    h += '<div class="interp"><h3>Le domande di questo audit</h3><ul style="margin-bottom:0">'
+      + meta.questions.map(function(q){ return '<li>'+esc(q)+'</li>'; }).join('')+'</ul></div>';
+  }
+  S('sintesi','In sintesi', null, h);
+})();
+
+/* ===================== 2. Fonti e sentiment ===================== */
+(function(){
+  var h = '';
+
+  if (has(D.sources)){
+    var rows = D.sources.map(function(s){
+      var cls = s.status==='ok'?'ok':(s.status==='partial'?'warn':(s.status==='failed'?'bad':''));
+      var lab = {ok:'Completa',partial:'Parziale',failed:'Fallita',skipped:'Esclusa'}[s.status]||s.status||'';
+      return [esc(s.name||s.id||''), num(s.items), esc(s.period||''),
+              '<span class="badge '+cls+'">'+esc(lab)+'</span>', esc(s.note||'')];
+    });
+    h += table([{t:'Fonte'},{t:'Contenuti',num:true},{t:'Periodo'},{t:'Stato'},{t:'Nota'}], rows);
+  }
+
+  if (has(D.sentiment_by_source)){
+    h += '<h3 style="margin:28px 0 4px">Sentiment per fonte</h3>'
+      + '<p class="small" style="max-width:70ch">Conteggi di contenuti raccolti, non di clienti. Chi scrive una recensione o apre '
+      + 'un thread è autoselezionato e più polarizzato della media, quindi le proporzioni vanno lette per fonte e non sommate.</p>'
+      + canvas('cSent');
+    h += legend(SENT.map(function(s){ return {l:s.l, c:cssv(s.v)}; }));
+    var cols = [{t:'Fonte'}].concat(SENT.map(function(s){ return {t:s.l, num:true}; })).concat([{t:'Totale',num:true}]);
+    h += dataTable(cols, D.sentiment_by_source.map(function(r){
+      var tot = SENT.reduce(function(a,s){ return a + (r[s.k]||0); },0);
+      return [esc(r.source)].concat(SENT.map(function(s){ return num(r[s.k]||0); })).concat([num(tot)]);
+    }));
+  }
+
+  if (D.volume_over_time && has(D.volume_over_time.points)){
+    h += '<h3 style="margin:30px 0 8px">Volume nel tempo</h3>' + canvas('cVol');
+    var srcs = {};
+    D.volume_over_time.points.forEach(function(p){ Object.keys(p.by_source||{}).forEach(function(k){ srcs[k]=1; }); });
+    var keys = Object.keys(srcs).slice(0,5);
+    h += legend(keys.map(function(k,i){ return {l:k, c:cssv(SERIES_TOKENS[i])}; }));
+    h += dataTable([{t:'Periodo'}].concat(keys.map(function(k){ return {t:k,num:true}; })),
+      D.volume_over_time.points.map(function(p){
+        return [esc(p.date)].concat(keys.map(function(k){ return num((p.by_source||{})[k]||0); }));
+      }));
+  }
+
+  S('fonti','Fonti e sentiment','Cosa è stato raccolto, da dove, e come si distribuisce il giudizio su ciascuna piattaforma.', h);
+})();
+
+/* ===================== 2bis. Cronistoria =====================
+   Il pezzo che trasforma una fotografia in un racconto: come sono cambiati
+   sentiment, temi e visibilita' negli LLM lungo la finestra analizzata. */
+(function(){
+  var T = D.timeline; if (!T) return;
+  var h = '';
+  var sparse = (T.sentiment||[]).filter(function(p){ return p.sparse; }).length;
+
+  if (T.narrative){
+    h += '<div class="interp"><h3>Come è cambiata la conversazione</h3><p>'+esc(T.narrative)+'</p></div>';
+  }
+
+  if (has(T.sentiment)){
+    h += '<h3 style="margin:26px 0 4px">Composizione del giudizio, periodo per periodo</h3>'
+      + '<p class="small" style="max-width:72ch">Quote calcolate su ciascun periodo, non sul totale: '
+      + 'serve a separare un aumento di negatività da un semplice aumento di volume. Il totale dei '
+      + 'contenuti di ogni periodo è nella tabella qui sotto.</p>'
+      + canvas('cTimeSent')
+      + legend(SENT.map(function(s){ return {l:s.l, c:cssv(s.v)}; }));
+    if (sparse){
+      h += '<p class="note">'+sparse+' periodi contengono meno di trenta contenuti e sono marcati come '
+        + 'poco popolati nella tabella: su quelle basi le percentuali non reggono e vanno lette come conteggi.</p>';
+    }
+    h += dataTable(
+      [{t:'Periodo'},{t:'Contenuti',num:true}].concat(SENT.map(function(s){ return {t:s.l,num:true}; })).concat([{t:'Nota'}]),
+      T.sentiment.map(function(p){
+        var tot = p.total || SENT.reduce(function(a,s){ return a+(p[s.k]||0); },0);
+        return [esc(p.date), num(tot)]
+          .concat(SENT.map(function(s){ return num(p[s.k]||0); }))
+          .concat([p.sparse ? '<span class="badge warn">poco popolato</span>' : '']);
+      }));
+  }
+
+  if (has(T.themes)){
+    h += '<h3 style="margin:30px 0 4px">Peso dei temi nel tempo</h3>'
+      + '<p class="small" style="max-width:72ch">Quota di ciascun tema sul totale del periodo. È qui che si '
+      + 'vede un tema che nasce, uno che cresce e uno che sparisce, che è di solito l\'informazione più '
+      + 'utile dell\'intera cronistoria.</p>'
+      + canvas('cTimeThemes')
+      + legend(T.themes.slice(0,5).map(function(t,i){ return {l:t.name, c:cssv(SERIES_TOKENS[i])}; }));
+    var dates = {};
+    T.themes.forEach(function(t){ (t.points||[]).forEach(function(p){ dates[p.date]=1; }); });
+    var dk = Object.keys(dates).sort();
+    h += dataTable([{t:'Periodo'}].concat(T.themes.slice(0,5).map(function(t){ return {t:t.name,num:true}; })),
+      dk.map(function(d){
+        return [esc(d)].concat(T.themes.slice(0,5).map(function(t){
+          var pt = (t.points||[]).filter(function(x){ return x.date===d; })[0];
+          return pt ? (pt.share!=null ? pct(pt.share,1) : num(pt.volume)) : '';
+        }));
+      }));
+  }
+
+  if (T.llm_visibility && has(T.llm_visibility.points)){
+    var V = T.llm_visibility;
+    h += '<h3 style="margin:30px 0 4px">Visibilità negli LLM nel tempo</h3>'
+      + '<p class="small" style="max-width:72ch">'+esc(V.note || 'Serie storica delle menzioni, misurata su un archivio di risposte generative.')
+      + ' Misura una cosa diversa dai prompt eseguiti per questo audit e non va sommata a quelli.</p>'
+      + canvas('cLlmVis');
+    var ents = {};
+    V.points.forEach(function(p){ Object.keys(p.by_entity||{}).forEach(function(k){ ents[k]=1; }); });
+    var ek = Object.keys(ents).slice(0,5);
+    h += legend(ek.map(function(k,i){ return {l:k, c:cssv(SERIES_TOKENS[i])}; }));
+    h += dataTable([{t:'Periodo'}].concat(ek.map(function(k){ return {t:k,num:true}; })),
+      V.points.map(function(p){
+        return [esc(p.date)].concat(ek.map(function(k){ return num((p.by_entity||{})[k]||0); }));
+      }));
+  }
+
+  if (has(T.milestones)){
+    var kb = {picco:'warn', svolta:'bad', evento:'', artefatto:'warn'};
+    h += '<h3 style="margin:30px 0 8px">Cosa è successo, e quando</h3>'
+      + table([{t:'Periodo'},{t:'Tipo'},{t:'Cosa'},{t:'Spiegazione'}],
+        T.milestones.map(function(m){
+          return [esc(m.date), '<span class="badge '+(kb[m.kind]||'')+'">'+esc(m.kind||'')+'</span>',
+                  esc(m.label||''), esc(m.explanation||'')];
+        }));
+    h += '<p class="note">Un picco è un evento isolato, una svolta è una pendenza che si mantiene su più '
+      + 'periodi: il primo si spiega, la seconda si affronta. Gli artefatti sono variazioni dovute alla '
+      + 'raccolta e non alla realtà, segnalate per non essere lette come tendenze.</p>';
+  }
+
+  S('cronistoria','Cronistoria','Come sono cambiati volume, giudizio e temi lungo il periodo analizzato. Le quote di ogni periodo sono calcolate sul periodo stesso.', h);
+})();
+
+/* ===================== 3. Temi ===================== */
+(function(){
+  if (!has(D.themes)) return;
+  var h = canvas('cThemes', true);
+  h += dataTable([{t:'Tema'},{t:'Contenuti',num:true},{t:'Quota',num:true},{t:'Negativi',num:true}],
+    D.themes.map(function(t){
+      var s = t.sentiment||{};
+      return [esc(t.name), num(t.volume), pct(t.share,1), num(s.negative||0)];
+    }));
+
+  h += '<div style="margin-top:26px">' + D.themes.map(function(t){
+    var s = t.sentiment||{}, tot = SENT.reduce(function(a,x){ return a+(s[x.k]||0); },0) || 1;
+    var bar = SENT.map(function(x){
+      var v = s[x.k]||0; if (!v) return '';
+      return '<i style="width:'+(v/tot*100)+'%; background:'+cssv(x.v)+'"></i>';
+    }).join('');
+    var by = t.by_source ? Object.keys(t.by_source).map(function(k){
+      return '<span class="chip">'+esc(k)+' '+num(t.by_source[k])+'</span>'; }).join('') : '';
+    var q = has(t.quotes) ? t.quotes.slice(0,3).map(function(c){
+      var m = {positive:'pos',negative:'neg',mixed:'mix',neutral:'neu'}[c.sentiment]||'neu';
+      return '<div class="quote '+m+'"><p>“'+esc(c.text)+'”</p>'
+        + '<div class="src">'+esc(c.source||'')+(c.date?' · '+esc(c.date):'')+'</div></div>';
+    }).join('') : '';
+    return '<div class="theme">'
+      + '<div class="head"><h3>'+esc(t.name)+'</h3>'
+      + '<span class="vol">'+num(t.volume)+' contenuti'+(t.share!=null?' · '+pct(t.share,1)+' del totale':'')+'</span></div>'
+      + (t.definition?'<p class="small" style="margin:6px 0 0">'+esc(t.definition)+'</p>':'')
+      + '<div class="bar">'+bar+'</div>'
+      + (by?'<div class="metarow" style="margin-top:2px">'+by+'</div>':'')
+      + q + '</div>';
+  }).join('') + '</div>';
+
+  S('temi','Temi ricorrenti','I temi emergono dal materiale raccolto, non da una lista predefinita. Le citazioni sono testuali.', h);
+})();
+
+/* ===================== 3bis. Dentro i video =====================
+   I commenti dicono cosa pensa il pubblico, la trascrizione dice cosa gli e'
+   stato detto. L'unita' e' l'occorrenza in cui il brand viene nominato. */
+(function(){
+  var V = D.video_mentions; if (!V || !has(V.items)) return;
+  var RL = {soggetto:'Soggetto del video', confronto:'Termine di paragone', citazione:'Citazione di passaggio'};
+  var SB = {positive:'ok', negative:'bad', mixed:'warn', neutral:''};
+  var SL = {positive:'positivo', negative:'negativo', mixed:'misto', neutral:'neutro'};
+
+  var h = '';
+  var chips = [];
+  if (V.videos_analysed) chips.push(V.videos_analysed+' video analizzati');
+  if (V.occurrences)     chips.push(V.occurrences+' passaggi in cui il brand è nominato');
+  if (chips.length) h += '<div class="metarow" style="margin-bottom:16px">'+chips.map(function(c){ return '<span class="chip">'+esc(c)+'</span>'; }).join('')+'</div>';
+  if (V.note) h += '<p class="small" style="max-width:72ch">'+esc(V.note)+'</p>';
+
+  h += V.items.map(function(it){
+    var m = {positive:'pos',negative:'neg',mixed:'mix',neutral:'neu'}[it.sentiment]||'neu';
+    var head = [];
+    if (it.role)    head.push('<span class="badge '+(it.role==='soggetto'?'':'')+'">'+esc(RL[it.role]||it.role)+'</span>');
+    if (it.sentiment) head.push('<span class="badge '+(SB[it.sentiment]||'')+'">'+esc(SL[it.sentiment]||it.sentiment)+'</span>');
+    if (it.theme)   head.push('<span class="chip">'+esc(it.theme)+'</span>');
+    if (it.views!=null) head.push('<span class="chip">'+num(it.views)+' visualizzazioni</span>');
+    var title = it.url ? '<a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.video_title||it.url)+'</a>'
+                       : esc(it.video_title||'');
+    return '<div class="theme">'
+      + '<h4 style="margin-bottom:2px">'+title+'</h4>'
+      + '<div class="src small faint" style="margin-bottom:8px">'+esc(it.channel||'')
+      +   (it.published?' · '+esc(it.published):'')+(it.timestamp?' · minuto '+esc(it.timestamp):'')+'</div>'
+      + (head.length?'<div class="metarow" style="margin:0 0 10px">'+head.join('')+'</div>':'')
+      + '<div class="quote '+m+'"><p>“'+esc(it.quote||'')+'”</p></div>'
+      + (it.divergence?'<p class="note"><strong>Nei commenti si legge altro.</strong> '+esc(it.divergence)+'</p>':'')
+      + '</div>';
+  }).join('');
+
+  h += '<p class="note">I passaggi sono citati con il minutaggio per essere verificabili in pochi secondi. '
+    + 'Dove la trascrizione è automatica può sbagliare i nomi propri, quindi ogni citazione usata come prova '
+    + 'è stata ricontrollata sul video.</p>';
+
+  S('video','Cosa si dice dentro i video','Estratti dalle trascrizioni di canali terzi, non del brand. Il giudizio di chi ha il microfono pesa più di molti commenti e finisce spesso fra le fonti che gli LLM leggono.', h);
+})();
+
+/* ===================== 4. Risposte degli LLM ===================== */
+(function(){
+  var L = D.llm; if (!L) return;
+  var h = '';
+
+  var info = [];
+  if (has(L.models)) info.push('Modelli interrogati: '+L.models.join(', '));
+  if (L.runs_per_prompt) info.push('Esecuzioni per prompt: '+L.runs_per_prompt);
+  if (info.length) h += '<div class="metarow" style="margin-bottom:18px">'+info.map(function(i){ return '<span class="chip">'+esc(i)+'</span>'; }).join('')+'</div>';
+
+  if (has(L.share_of_voice)){
+    h += '<h3 style="margin:0 0 4px">Share of voice generativo</h3>'
+      + '<p class="small" style="max-width:70ch">Quota di risposte in cui l\'entità viene nominata, sui prompt che <strong>non</strong> '
+      + 'contengono il nome del brand. È la misura di quanto il brand esiste nella risposta quando nessuno lo evoca.</p>'
+      + canvas('cSov');
+    h += dataTable([{t:'Entità'},{t:'Menzioni',num:true},{t:'Esecuzioni',num:true},{t:'Quota',num:true},{t:'Posizione media',num:true}],
+      L.share_of_voice.map(function(r){
+        return [esc(r.entity)+(r.is_brand?' <span class="badge ok">brand</span>':''), num(r.mentions), num(r.runs),
+                pct(r.share,0), r.avg_position!=null?String(r.avg_position).replace('.',','):''];
+      }));
+  }
+
+  if (has(L.by_family)){
+    h += '<h3 style="margin:30px 0 8px">Presenza del brand per tipo di domanda</h3>' + canvas('cFam');
+    h += dataTable([{t:'Famiglia di prompt'},{t:'Presenza del brand',num:true},{t:'Esecuzioni',num:true}],
+      L.by_family.map(function(r){ return [esc(r.family), pct(r.brand_share,0), num(r.runs)]; }));
+  }
+
+  if (has(L.facts)){
+    var vb = {corretto:'ok', impreciso:'warn', errato:'bad', obsoleto:'warn'};
+    h += '<h3 style="margin:30px 0 8px">Cosa i modelli sbagliano sul brand</h3>'
+      + table([{t:'Affermazione del modello'},{t:'Verdetto'},{t:'Come stanno le cose'},{t:'Fonte probabile'}],
+        L.facts.map(function(f){
+          return [esc(f.claim), '<span class="badge '+(vb[f.verdict]||'')+'">'+esc(f.verdict||'')+'</span>',
+                  esc(f.reality||''), esc(f.source_guess||'')];
+        }));
+    h += '<p class="note">Registra cosa afferma un modello in una data rilevazione, non accerta un fatto sul brand.</p>';
+  }
+
+  if (has(L.objections)){
+    h += '<h3 style="margin:30px 0 8px">Obiezioni riportate dai modelli</h3>'
+      + table([{t:'Obiezione'},{t:'Ricorrenze',num:true},{t:'Fonti citate'}],
+        L.objections.map(function(o){
+          return [esc(o.text), num(o.frequency), esc((o.cited_sources||[]).join(', '))];
+        }));
+  }
+
+  S('llm','Come ne parlano gli LLM','Rilevazione puntuale e datata. Le risposte dei modelli non sono deterministiche: dove indicato, il dato è una frequenza su più esecuzioni.', h);
+})();
+
+/* ===================== 5. Mappa delle fonti ===================== */
+(function(){
+  if (!has(D.sources_map)) return;
+  var bs = {presente:'ok', parziale:'warn', assente:'bad'};
+  var h = '<p class="small" style="max-width:72ch">I domini che ricorrono nelle risposte generative, negli AI Overview e nelle prime '
+    + 'posizioni delle query di brand. Le righe in cui il brand è assente sono la lista di lavoro per la digital PR, quelle in cui '
+    + 'è presente ma raccontato male sono di solito più urgenti e più economiche da sistemare.</p>'
+    + canvas('cSrc', true)
+    + legend([{l:'Citazioni LLM', c:cssv('--s1')},
+              {l:'Citazioni AI Overview', c:cssv('--s3')},
+              {l:'Presenze in SERP', c:cssv('--s5')}])
+    + table([{t:'Dominio'},{t:'Citazioni LLM',num:true},{t:'Citazioni AI Overview',num:true},{t:'Presenze in SERP',num:true},{t:'Totale',num:true},{t:'Il brand'},{t:'Nota'}],
+      D.sources_map.map(function(r){
+        return [esc(r.domain), num(r.llm_citations), num(r.aio_citations), num(r.serp_positions),
+                num(r.total), '<span class="badge '+(bs[r.brand_status]||'')+'">'+esc(r.brand_status||'')+'</span>', esc(r.note||'')];
+      }));
+  S('mappa','Le fonti che costruiscono la reputazione', null, h);
+})();
+
+/* ===================== 6. Gap ===================== */
+(function(){
+  if (!has(D.gap)) return;
+  var vb = {confermata:'ok', contraddetta:'bad', assente:'warn', non_rivendicata:'ok'};
+  var vl = {confermata:'Confermata', contraddetta:'Contraddetta', assente:'Assente dalle conversazioni', non_rivendicata:'Apprezzata ma non rivendicata'};
+  var h = table([{t:'Cosa promette il brand'},{t:'Verdetto'},{t:'Evidenza'},{t:'Contenuti',num:true}],
+    D.gap.map(function(g){
+      return [esc(g.promise), '<span class="badge '+(vb[g.verdict]||'')+'">'+esc(vl[g.verdict]||g.verdict||'')+'</span>',
+              esc(g.evidence||''), num(g.items)];
+    }));
+  S('gap','Racconto e percezione','Le promesse estratte dal sito, messe a confronto con quello che dicono le conversazioni raccolte.', h);
+})();
+
+/* ===================== 7. Competitor ===================== */
+(function(){
+  if (!has(D.competitors)) return;
+  var h = table([{t:'Brand'},{t:'Share of voice LLM',num:true},{t:'Quota di negativi',num:true},{t:'Recensioni raccolte',num:true},{t:'Nota'}],
+    D.competitors.map(function(c){
+      return [esc(c.name), pct(c.sov,0), pct(c.sentiment_negative,0), num(c.review_volume), esc(c.note||'')];
+    }));
+  S('competitor','Confronto con i competitor','Serve a dare una scala ai numeri: un sentiment negativo del trenta per cento significa cose opposte a seconda del settore.', h);
+})();
+
+/* ===================== 8. Raccomandazioni ===================== */
+(function(){
+  if (!has(D.recommendations)) return;
+  var h = D.recommendations.map(function(r,i){
+    var tags = [];
+    if (r.lever)   tags.push('<span class="chip">'+esc(r.lever)+'</span>');
+    if (r.impact)  tags.push('<span class="chip">Impatto '+esc(r.impact)+'</span>');
+    if (r.effort)  tags.push('<span class="chip">Sforzo '+esc(r.effort)+'</span>');
+    if (r.horizon) tags.push('<span class="chip">'+esc(r.horizon)+'</span>');
+    return '<div class="rec"><div class="n">'+(i+1)+'</div><div class="body">'
+      + '<h4>'+esc(r.title)+'</h4>'
+      + (r.evidence?'<p class="small" style="margin:0">'+esc(r.evidence)+'</p>':'')
+      + (tags.length?'<div class="tags">'+tags.join('')+'</div>':'')
+      + '</div></div>';
+  }).join('');
+  S('azioni','Cosa fare','Ordinate per rapporto fra impatto e sforzo, non per gravità del problema. Ogni azione richiama l\'evidenza che la sostiene.', h);
+})();
+
+/* ===================== 9. Sezioni su misura ===================== */
+(function(){
+  if (!has(D.custom_sections)) return;
+  D.custom_sections.forEach(function(c,i){ S('extra'+i, c.title||'Approfondimento', null, c.html||''); });
+})();
+
+/* ===================== 10. Metodologia ===================== */
+(function(){
+  var m = D.methodology; if (!m) return;
+  var h = '<div class="grid g2">';
+  if (has(m.notes))  h += '<div class="card"><h3>Come sono stati raccolti</h3><ul>'+m.notes.map(function(n){ return '<li>'+esc(n)+'</li>'; }).join('')+'</ul></div>';
+  if (has(m.limits)) h += '<div class="card"><h3>Limiti dichiarati</h3><ul>'+m.limits.map(function(n){ return '<li>'+esc(n)+'</li>'; }).join('')+'</ul></div>';
+  h += '</div>';
+  if (has(m.failed_sources)){
+    h += '<h3 style="margin:26px 0 8px">Fonti non raccolte</h3>'
+      + table([{t:'Fonte'},{t:'Motivo'}], m.failed_sources.map(function(f){ return [esc(f.source), esc(f.reason||'')]; }));
+  }
+  var foot = [];
+  if (m.calls && m.calls.dataforseo!=null) foot.push('Chiamate DataForSEO: '+num(m.calls.dataforseo));
+  if (m.calls && m.calls.apify_runs!=null) foot.push('Run Apify: '+num(m.calls.apify_runs));
+  if (m.cost_estimate) foot.push('Costo stimato: '+m.cost_estimate);
+  if (foot.length) h += '<div class="metarow" style="margin-top:20px">'+foot.map(function(f){ return '<span class="chip">'+esc(f)+'</span>'; }).join('')+'</div>';
+  S('metodo','Metodologia e limiti', null, h);
+})();
+
+/* ===================== Navigazione ===================== */
+(function(){
+  var toc = document.getElementById('toc');
+  toc.innerHTML = sections.map(function(s){ return '<a href="#'+s.id+'">'+esc(s.title)+'</a>'; }).join('')
+    + '<button class="themeBtn" id="tbtn" type="button">Tema</button>';
+  var btn = document.getElementById('tbtn');
+  btn.addEventListener('click', function(){
+    var cur = document.documentElement.getAttribute('data-theme');
+    var dark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    charts.forEach(function(c){ try{ c.destroy(); }catch(e){} });
+    charts = []; render();
+  });
+  var links = [].slice.call(toc.querySelectorAll('a'));
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(en){
+      en.forEach(function(e){
+        if (!e.isIntersecting) return;
+        links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href')==='#'+e.target.id); });
+      });
+    }, {rootMargin:'-70px 0px -70% 0px'});
+    sections.forEach(function(s){ var el=document.getElementById(s.id); if (el) io.observe(el); });
+  }
+})();
+
+/* ===================== Grafici ===================== */
+function render(){
+  var pal = series();
+
+  if (has(D.sentiment_by_source)){
+    draw('cSent', {
+      type:'bar',
+      data:{
+        labels: D.sentiment_by_source.map(function(r){ return r.source; }),
+        datasets: SENT.map(function(s){
+          return { label:s.l, data:D.sentiment_by_source.map(function(r){ return r[s.k]||0; }), backgroundColor:tok(s.v) };
+        })
+      },
+      options:{ indexAxis:'y', scales:{ x:{stacked:true, beginAtZero:true}, y:{stacked:true, grid:{display:false}} } }
+    });
+  }
+
+  if (D.volume_over_time && has(D.volume_over_time.points)){
+    var srcs = {};
+    D.volume_over_time.points.forEach(function(p){ Object.keys(p.by_source||{}).forEach(function(k){ srcs[k]=1; }); });
+    var keys = Object.keys(srcs).slice(0,5);
+    draw('cVol', {
+      type:'line',
+      data:{
+        labels: D.volume_over_time.points.map(function(p){ return p.date; }),
+        datasets: keys.map(function(k,i){
+          return { label:k, data:D.volume_over_time.points.map(function(p){ return (p.by_source||{})[k]||0; }),
+                   borderColor:pal[i], backgroundColor:pal[i] };
+        })
+      },
+      options:{ scales:{ x:{grid:{display:false}}, y:{beginAtZero:true} } }
+    });
+  }
+
+  /* Cronistoria, composizione del giudizio: barre impilate normalizzate al 100%.
+     La quota di ogni periodo si legge sul periodo stesso, mentre il volume
+     assoluto resta nel grafico dei volumi e nella tabella qui sotto. */
+  if (D.timeline && has(D.timeline.sentiment)){
+    var TS = D.timeline.sentiment;
+    var totals = TS.map(function(p){
+      return p.total || SENT.reduce(function(a,s){ return a+(p[s.k]||0); },0) || 1;
+    });
+    draw('cTimeSent', {
+      type:'bar',
+      data:{
+        labels: TS.map(function(p){ return p.date + (p.sparse?' *':''); }),
+        datasets: SENT.map(function(s){
+          return { label:s.l, backgroundColor:tok(s.v),
+            data: TS.map(function(p,i){ return Math.round((p[s.k]||0)/totals[i]*1000)/10; }) };
+        })
+      },
+      options:{
+        plugins:{ tooltip:{ callbacks:{
+          label:function(c){ return c.dataset.label+': '+String(c.parsed.y).replace('.',',')+'%'; },
+          footer:function(items){ return items.length ? 'Contenuti nel periodo: '+num(totals[items[0].dataIndex]) : ''; }
+        } } },
+        scales:{ x:{stacked:true, grid:{display:false}},
+                 y:{stacked:true, beginAtZero:true, max:100, ticks:{callback:function(v){ return v+'%'; }}} }
+      }
+    });
+  }
+
+  if (D.timeline && has(D.timeline.themes)){
+    var TT = D.timeline.themes.slice(0,5);
+    var td = {};
+    D.timeline.themes.forEach(function(t){ (t.points||[]).forEach(function(p){ td[p.date]=1; }); });
+    var tdk = Object.keys(td).sort();
+    draw('cTimeThemes', {
+      type:'line',
+      data:{
+        labels: tdk,
+        datasets: TT.map(function(t,i){
+          return { label:t.name, borderColor:pal[i], backgroundColor:pal[i],
+            data: tdk.map(function(d){
+              var pt = (t.points||[]).filter(function(x){ return x.date===d; })[0];
+              return pt ? (pt.share!=null ? Math.round(pt.share*1000)/10 : pt.volume) : null;
+            }), spanGaps:true };
+        })
+      },
+      options:{
+        plugins:{ tooltip:{ callbacks:{
+          label:function(c){ return c.dataset.label+': '+String(c.parsed.y).replace('.',',')+'%'; } } } },
+        scales:{ x:{grid:{display:false}},
+                 y:{beginAtZero:true, ticks:{callback:function(v){ return v+'%'; }}} }
+      }
+    });
+  }
+
+  if (D.timeline && D.timeline.llm_visibility && has(D.timeline.llm_visibility.points)){
+    var VP = D.timeline.llm_visibility.points, ents = {};
+    VP.forEach(function(p){ Object.keys(p.by_entity||{}).forEach(function(k){ ents[k]=1; }); });
+    var ek = Object.keys(ents).slice(0,5);
+    draw('cLlmVis', {
+      type:'line',
+      data:{
+        labels: VP.map(function(p){ return p.date; }),
+        datasets: ek.map(function(k,i){
+          return { label:k, borderColor:pal[i], backgroundColor:pal[i],
+                   data: VP.map(function(p){ return (p.by_entity||{})[k]; }), spanGaps:true };
+        })
+      },
+      options:{ scales:{ x:{grid:{display:false}}, y:{beginAtZero:true} } }
+    });
+  }
+
+  if (has(D.themes)){
+    draw('cThemes', {
+      type:'bar',
+      data:{
+        labels: D.themes.map(function(t){ return t.name; }),
+        datasets: SENT.map(function(s){
+          return { label:s.l, data:D.themes.map(function(t){ return (t.sentiment||{})[s.k]||0; }), backgroundColor:tok(s.v) };
+        })
+      },
+      options:{ indexAxis:'y', scales:{ x:{stacked:true, beginAtZero:true}, y:{stacked:true, grid:{display:false}} } }
+    });
+  }
+
+  if (D.llm && has(D.llm.share_of_voice)){
+    var sov = D.llm.share_of_voice;
+    draw('cSov', {
+      type:'bar',
+      data:{
+        labels: sov.map(function(r){ return r.entity; }),
+        datasets:[{ label:'Share of voice',
+          data: sov.map(function(r){ return Math.round((r.share||0)*1000)/10; }),
+          backgroundColor: sov.map(function(r){ return r.is_brand ? tok('--accent') : tok('--s1'); }) }]
+      },
+      options:{ indexAxis:'y',
+        plugins:{ tooltip:{ callbacks:{ label:function(c){ return c.parsed.x.toString().replace('.',',')+'%'; } } } },
+        scales:{ x:{beginAtZero:true, max:100, ticks:{callback:function(v){ return v+'%'; }}}, y:{grid:{display:false}} } }
+    });
+  }
+
+  if (D.llm && has(D.llm.by_family)){
+    draw('cFam', {
+      type:'bar',
+      data:{
+        labels: D.llm.by_family.map(function(r){ return r.family; }),
+        datasets:[{ label:'Presenza del brand',
+          data: D.llm.by_family.map(function(r){ return Math.round((r.brand_share||0)*1000)/10; }),
+          backgroundColor: tok('--accent') }]
+      },
+      options:{ indexAxis:'y',
+        plugins:{ tooltip:{ callbacks:{ label:function(c){ return c.parsed.x.toString().replace('.',',')+'%'; } } } },
+        scales:{ x:{beginAtZero:true, max:100, ticks:{callback:function(v){ return v+'%'; }}}, y:{grid:{display:false}} } }
+    });
+  }
+
+  if (has(D.sources_map)){
+    var top = D.sources_map.slice(0,12);
+    draw('cSrc', {
+      type:'bar',
+      data:{
+        labels: top.map(function(r){ return r.domain; }),
+        datasets:[
+          { label:'Citazioni LLM',          data:top.map(function(r){ return r.llm_citations||0; }), backgroundColor:tok('--s1') },
+          { label:'Citazioni AI Overview',  data:top.map(function(r){ return r.aio_citations||0; }), backgroundColor:tok('--s3') },
+          { label:'Presenze in SERP',       data:top.map(function(r){ return r.serp_positions||0; }), backgroundColor:tok('--s5') }
+        ]
+      },
+      options:{ indexAxis:'y', scales:{ x:{stacked:true, beginAtZero:true}, y:{stacked:true, grid:{display:false}} } }
+    });
+  }
+}
+
+if (typeof Chart === 'undefined'){
+  /* Senza connessione i grafici non si disegnano: apriamo le tabelle dei dati,
+     cosi' il report resta leggibile e verificabile comunque. */
+  [].forEach.call(document.querySelectorAll('details.data'), function(d){ d.open = true; });
+  [].forEach.call(document.querySelectorAll('.chartwrap'), function(c){
+    c.innerHTML = '<p class="small faint" style="padding:12px 0">Grafico non disponibile senza connessione. I dati sono nella tabella qui sotto.</p>';
+    c.style.height = 'auto';
+  });
+} else {
+  render();
+}
+
+})();
+</script>
+</body>
+</html>
