@@ -39,7 +39,7 @@ perché da lì in poi si spendono soldi veri.
 
 ## Fase 0, preflight
 
-Prima di qualsiasi altra cosa verifica che i due server MCP rispondano. Farlo
+Prima di qualsiasi altra cosa verifica che DataForSEO e Apify rispondano. Farlo
 adesso evita di scoprire a metà raccolta che manca una credenziale, con dei dati
 a metà e un utente che ha già speso.
 
@@ -47,22 +47,30 @@ a metà e un utente che ha già speso.
 bash scripts/preflight.sh
 ```
 
-Lo script elenca i server MCP configurati e dice quali dei due mancano. Se uno dei
-due non c'è o non risponde, apri `references/setup-mcp.md` e segui la procedura,
-che è scritta per essere passata all'utente così com'è.
+Lo script elenca i server MCP configurati e dice quali dei due mancano. Se ne manca
+uno, la procedura completa è in `references/setup-mcp.md`, scritta per essere
+passata all'utente così com'è. Nella maggior parte dei casi bastano due comandi,
+perché entrambi i servizi hanno un server remoto che si autorizza dal browser:
 
-Due regole non negoziabili nel gestire le credenziali:
+```bash
+claude mcp add --transport http dataforseo https://mcp.dataforseo.com/mcp
+claude mcp add --transport http apify      https://mcp.apify.com
+```
+
+Due regole non negoziabili:
 
 - **Non chiedere mai all'utente di incollare token o password nella chat.** Restano
-  nella cronologia della conversazione. Dagli il comando da eseguire nel suo
-  terminale, con i segnaposto al posto dei segreti.
-- **Non inventare credenziali e non proseguire "a secco".** Se un server manca,
+  nella cronologia della conversazione. Con i server remoti il problema non si pone,
+  e per le installazioni locali il comando si esegue nel terminale con i segnaposto
+  al posto dei segreti.
+- **Non inventare credenziali e non proseguire "a secco".** Se un servizio manca,
   l'audit si ferma lì. Meglio una fase di setup di cinque minuti che un report
   costruito su metà dati senza dirlo.
 
-Se manca solo uno dei due server puoi proporre un audit parziale, dichiarando in
-modo esplicito cosa resta fuori. Senza DataForSEO perdi SERP e risposte LLM, cioè
-il pezzo più interessante. Senza Apify perdi recensioni e social, cioè il volume.
+Se manca solo uno dei due servizi puoi proporre un audit parziale, dichiarando in
+modo esplicito cosa resta fuori. Senza DataForSEO perdi SERP, risposte LLM e storico
+delle menzioni, cioè il pezzo più interessante. Senza Apify perdi recensioni, social
+e trascrizioni video, cioè il volume e le citazioni vere.
 
 ---
 

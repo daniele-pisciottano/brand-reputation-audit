@@ -12,8 +12,22 @@ echo "Preflight brand-reputation-audit"
 echo "--------------------------------"
 
 if ! command -v claude >/dev/null 2>&1; then
-  echo "La CLI 'claude' non e' nel PATH."
-  echo "Questa skill e' pensata per Claude Code. Verifica i server MCP dal tuo client."
+  cat <<'EOF'
+La CLI 'claude' non e' disponibile qui, quindi non posso leggere l'elenco dei
+server MCP.
+
+Questa skill e' pensata per Claude Code: se sei li', assicurati che 'claude' sia
+nel PATH e rilancia questo preflight.
+
+Se invece la stai usando su claude.ai o nell'app desktop, i due servizi si
+collegano come connettori invece che da terminale: Personalizza, Connettori,
+"Aggiungi connettore personalizzato", e incolla questi indirizzi.
+
+  DataForSEO   https://mcp.dataforseo.com/mcp
+  Apify        https://mcp.apify.com
+
+Il dettaglio e' in references/setup-mcp.md, ultima sezione.
+EOF
   exit 1
 fi
 
@@ -53,44 +67,30 @@ if [ "$DFS" -eq 0 ] && [ "$APY" -eq 0 ]; then
   exit 0
 fi
 
-echo "Manca qualcosa. Comandi da eseguire NEL TERMINALE, sostituendo i segnaposto."
-echo "Non incollare mai token o password dentro la chat."
+echo "Manca qualcosa. Comandi da eseguire NEL TERMINALE."
+echo "Entrambi i servizi hanno un server remoto: nessuna credenziale da incollare,"
+echo "l'autorizzazione si fa nel browser al primo utilizzo."
 echo
 
 if [ "$DFS" -ne 0 ]; then
-  cat <<'EOF'
-DataForSEO (SERP, AI Overview, risposte degli LLM)
-  Credenziali: dashboard DataForSEO, sezione API Access. Sono diverse da quelle
-  con cui accedi al sito. Account prepagato, nessun abbonamento necessario.
-
-  claude mcp add dataforseo \
-    --env DATAFORSEO_USERNAME=IL_TUO_USERNAME_API \
-    --env DATAFORSEO_PASSWORD=LA_TUA_PASSWORD_API \
-    --env ENABLED_MODULES="SERP,AI_OPTIMIZATION,CONTENT_ANALYSIS,BUSINESS_DATA,KEYWORDS_DATA" \
-    -- npx -y dataforseo-mcp-server
-
-  I nomi dei moduli sono maiuscoli ed esatti. Se dopo l'installazione non vedi
-  nessuno strumento, togli del tutto ENABLED_MODULES e reinstalla.
-
-EOF
+  echo "DataForSEO (SERP, AI Overview, risposte e storico menzioni negli LLM)"
+  echo "  Serve un account DataForSEO, prepagato e senza canone."
+  echo
+  echo "  claude mcp add --transport http dataforseo https://mcp.dataforseo.com/mcp"
+  echo
 fi
 
 if [ "$APY" -ne 0 ]; then
-  cat <<'EOF'
-Apify (recensioni, social, scraping del sito)
-  Consigliato, con autenticazione dal browser al primo uso:
-
-  claude mcp add --transport http apify https://mcp.apify.com
-
-  In alternativa, con token locale preso dalla console Apify:
-
-  claude mcp add apify \
-    --env APIFY_TOKEN=apify_api_IL_TUO_TOKEN \
-    -- npx -y @apify/actors-mcp-server
-
-EOF
+  echo "Apify (recensioni, social, commenti, trascrizioni video, scraping del sito)"
+  echo "  Il piano gratuito include un credito mensile, sufficiente per un audit Quick."
+  echo
+  echo "  claude mcp add --transport http apify https://mcp.apify.com"
+  echo
 fi
 
+echo "Se preferisci far girare i server in locale con le tue credenziali API,"
+echo "i comandi alternativi sono in references/setup-mcp.md."
+echo
 echo "Dopo l'installazione RIAVVIA Claude Code: i server MCP si caricano all'avvio."
 echo "Poi rilancia questo preflight."
 exit 1

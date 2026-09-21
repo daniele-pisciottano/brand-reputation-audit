@@ -14,7 +14,7 @@ persona può leggere e usare.
 - [La mappa delle fonti](#la-mappa-delle-fonti)
 - [Il gap fra racconto e percezione](#il-gap-fra-racconto-e-percezione)
 - [Confronto con i competitor](#confronto-con-i-competitor)
-- [Dalle evidenze alle raccomandazioni](#dalle-evidenze-alle-raccomandazioni)
+- [La lettura per canale](#la-lettura-per-canale)
 - [Come marcare l'incertezza](#come-marcare-lincertezza)
 
 ---
@@ -31,8 +31,15 @@ modo più rapido per rendere un audit incontestabile e quindi inutile.
 3. **Raccomandato.** Cosa farne. "Presidiare le query su tempi e costi di spedizione
    con una pagina dedicata, oggi assente."
 
-Il lettore deve poter dissentire dal piano tre senza dover mettere in dubbio il
-piano uno. Nel report i tre piani hanno una resa visiva diversa, ed è il template a
+**Il report contiene i primi due piani, non il terzo.** È una scelta voluta: le
+azioni si decidono con il cliente davanti, tenendo conto di budget, priorità e
+vincoli che l'audit non conosce, e un elenco di raccomandazioni scritto prima di
+quella conversazione invecchia in una settimana. Se ti vengono in mente azioni
+mentre analizzi, annotale a parte e portale al tavolo, ma nel documento tieni
+separato quello che hai misurato da quello che ne deduci.
+
+Il lettore deve poter dissentire dal piano due senza dover mettere in dubbio il
+piano uno. Nel report i due piani hanno una resa visiva diversa, ed è il template a
 occuparsene, ma sta a te tenere le affermazioni nel piano giusto.
 
 ---
@@ -281,21 +288,37 @@ tre confronti mirati:
 
 ---
 
-## Dalle evidenze alle raccomandazioni
+## La lettura per canale
 
-Ogni raccomandazione del report deve avere tre attributi, altrimenti non entra:
+Il report mostra gli stessi contenuti due volte, per tema e per canale, e non è una
+ripetizione: sono due domande diverse. La vista per tema risponde a "di cosa si
+lamentano", quella per canale a "dove si lamentano, e con che intensità".
 
-1. **L'evidenza che la sostiene**, richiamata esplicitamente, con il numero.
-2. **Chi la esegue e con quale leva**: contenuti, digital PR, prodotto, servizio
-   clienti, presidio di una piattaforma.
-3. **Una stima di impatto e sforzo**, anche solo alta, media, bassa.
+La vista per canale si costruisce da sola dai dati che hai già normalizzato, quindi
+non devi compilarla. Quello che devi fare è **guardarla prima di scrivere le
+conclusioni**, perché è lì che si vedono le cose che le medie nascondono.
 
-Ordinale per rapporto fra impatto e sforzo, non per gravità del problema. Un audit
-che si chiude con quindici azioni tutte importanti non fa agire nessuno. Da cinque
-a otto raccomandazioni sono il formato giusto.
+Le tre domande da farsi davanti a quella sezione:
 
-Distingui sempre le azioni realizzabili entro un mese da quelle strutturali: chi
-riceve il report deve poter cominciare da qualcosa lunedì.
+- **Il tema dominante cambia da canale a canale?** Se su una piattaforma domina la
+  logistica e su un'altra la formulazione del prodotto, non hai un brand con un
+  problema, ne hai uno con due pubblici diversi che incontrano problemi diversi. È
+  la scoperta più frequente e la più utile.
+- **Un canale è molto più negativo degli altri?** Prima di concludere che quella
+  piattaforma è ostile, controlla chi ci scrive: i siti di recensioni raccolgono
+  soprattutto chi ha avuto un problema, i social raccolgono anche chi passa di lì.
+  Lo scarto può essere una differenza di pubblico, non di esperienza.
+- **Un tema forte altrove è assente su un canale?** Spesso vuol dire che lì il brand
+  intercetta una fase diversa del percorso d'acquisto, prima dell'acquisto invece
+  che dopo.
+
+**Non fare medie fra canali.** Sommare Trustpilot e TikTok per ottenere un sentiment
+unico produce un numero che non descrive nessuno dei due, e che si muove al variare
+di quanto hai raccolto da ciascuno invece che al variare della realtà.
+
+**Attenzione ai canali piccoli.** Sotto i cinquanta contenuti la scheda di un canale
+si legge come indizio, non come misura, e nel report va detto. Una quota del
+sessanta per cento di negativi su dodici contenuti sono sette commenti.
 
 ---
 

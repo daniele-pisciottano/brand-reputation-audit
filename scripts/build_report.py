@@ -72,6 +72,23 @@ def check(data):
             warn.append("llm.share_of_voice[%d]: le menzioni superano le esecuzioni." % i)
     for i, r in enumerate(llm.get("by_family") or []):
         ratio("llm.by_family[%d].brand_share" % i, r.get("brand_share"))
+    # La vista per canale si costruisce da sola incrociando sentiment_by_source,
+    # sources e i temi: qui controlliamo solo che i nomi combacino, perche' un
+    # nome scritto in due modi diversi produce un canale fantasma e uno vuoto.
+    src_names = {s.get("name") or s.get("id") for s in (data.get("sources") or [])}
+    chan_names = {r.get("source") for r in (data.get("sentiment_by_source") or [])}
+    orphans = sorted(n for n in chan_names - src_names if n)
+    if src_names and orphans:
+        warn.append("Canali presenti in sentiment_by_source ma non in sources: %s. I nomi devono combaciare, "
+                    "altrimenti nella vista per canale mancano periodo e note." % ", ".join(orphans))
+    for name in sorted(chan_names):
+        if not name:
+            continue
+        covered = any((t.get("by_source") or {}).get(name) for t in (data.get("themes") or []))
+        if data.get("themes") and not covered:
+            warn.append("Nessun tema riporta contenuti per il canale '%s': la sua scheda resta senza la parte "
+                        "piu' utile, cioe' di cosa si parla li'." % name)
+
     for i, c in enumerate(data.get("competitors") or []):
         ratio("competitors[%d].sov" % i, c.get("sov"))
         ratio("competitors[%d].sentiment_negative" % i, c.get("sentiment_negative"))
@@ -150,10 +167,6 @@ def check(data):
                     "preso con chi paga." % (cap["collected"], cap["requested"]))
     if not method.get("limits"):
         warn.append("methodology.limits e' vuoto: i limiti dichiarati rafforzano il report, non lo indeboliscono.")
-    if not data.get("recommendations"):
-        warn.append("Nessuna raccomandazione: il report si chiude senza dire cosa farne.")
-    elif len(data["recommendations"]) > 8:
-        warn.append("Piu' di otto raccomandazioni: sopra questa soglia non ne viene eseguita nessuna.")
 
     return warn
 

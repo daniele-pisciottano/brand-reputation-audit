@@ -3,10 +3,10 @@
 Una skill per Claude Code che raccoglie quello che si dice di un brand su fonti
 diverse, lo incrocia e produce un report HTML navigabile più i dati grezzi.
 
-Orchestra due server MCP, DataForSEO e Apify, per coprire SERP, AI Overview,
-risposte degli LLM, Reddit, Trustpilot, Google Maps, TikTok, Instagram, YouTube e
-il sito del brand. Il processo resta lo stesso per qualunque cliente, cambia solo
-il perimetro.
+Orchestra due servizi, DataForSEO e Apify, per coprire SERP, AI Overview, risposte
+e storico delle menzioni negli LLM, Reddit, Trustpilot, Google Maps, TikTok,
+Instagram, commenti e trascrizioni YouTube e il sito del brand. Il processo resta lo
+stesso per qualunque cliente, cambia solo il perimetro.
 
 ---
 
@@ -59,7 +59,10 @@ unzip brand-reputation-audit.skill -d ~/.claude/skills/
 **Riavvia Claude Code.** Le skill si caricano all'avvio e una appena copiata non
 compare nella sessione già aperta.
 
-### Verificare che ci sia
+Poi servono i due servizi: i comandi sono qui sotto, e li stampa anche
+`bash scripts/preflight.sh` quando ne manca uno.
+
+### Verificare che la skill ci sia
 
 Apri Claude Code e scrivi una frase come "analizza la reputazione online di
 [un brand]". Se la skill è installata, Claude la usa da solo. In alternativa
@@ -84,36 +87,30 @@ Se questo comando stampa il percorso, la skill è al posto giusto.
 
 ## Cosa serve prima di partire
 
-Due server MCP, entrambi a consumo e senza abbonamento mensile obbligatorio.
-
-**DataForSEO**, per SERP, AI Overview e risposte degli LLM. Credenziali dalla
-sezione API Access della dashboard, account prepagato.
-
-```bash
-claude mcp add dataforseo \
-  --env DATAFORSEO_USERNAME=IL_TUO_USERNAME_API \
-  --env DATAFORSEO_PASSWORD=LA_TUA_PASSWORD_API \
-  --env ENABLED_MODULES="SERP,AI_OPTIMIZATION,CONTENT_ANALYSIS,BUSINESS_DATA,KEYWORDS_DATA" \
-  -- npx -y dataforseo-mcp-server
-```
-
-**Apify**, per recensioni, social e scraping del sito. Il server remoto si
-autentica dal browser al primo uso, senza mettere token in nessun file.
+Due servizi, entrambi a consumo e senza abbonamento mensile obbligatorio. Tutti e
+due pubblicano un server remoto, quindi bastano due comandi e nessuna credenziale da
+incollare: l'autorizzazione si fa nel browser al primo utilizzo.
 
 ```bash
-claude mcp add --transport http apify https://mcp.apify.com
+claude mcp add --transport http dataforseo https://mcp.dataforseo.com/mcp
+claude mcp add --transport http apify      https://mcp.apify.com
 ```
 
-Non serve fare tutto adesso: la skill controlla le connessioni da sola alla prima
-esecuzione e, se manca qualcosa, stampa il comando giusto da incollare. Per
-verificare subito:
+Poi **riavvia Claude Code** e verifica:
 
 ```bash
 bash scripts/preflight.sh
 ```
 
-Il piano gratuito di Apify include un credito mensile che basta per provare un
-audit veloce.
+**DataForSEO** copre SERP, AI Overview, risposte degli LLM e storico delle menzioni.
+L'account è prepagato, si ricarica quanto serve e non c'è nessun canone.
+**Apify** copre recensioni, social, commenti, trascrizioni video e scraping del
+sito. Il piano gratuito include un credito mensile che basta per provare un audit
+veloce.
+
+Se preferisci far girare DataForSEO in locale con le tue credenziali API, invece
+del server remoto, il comando alternativo e la nota sui moduli da abilitare sono in
+`references/setup-mcp.md`.
 
 ---
 
@@ -155,18 +152,23 @@ output/<brand>-<data>/
 ```
 
 Il report contiene la sintesi, il sentiment per fonte, la **cronistoria**, i temi
-ricorrenti con le citazioni testuali, **cosa si dice dentro i video** di canali
-terzi, lo share of voice nelle risposte generative, la mappa dei domini che
-costruiscono la reputazione del brand, il confronto fra come il brand si racconta e
-come viene raccontato, e le azioni proposte, ognuna con l'evidenza che la sostiene.
+ricorrenti con le citazioni testuali, la vista **canale per canale**, **cosa si dice
+dentro i video** di canali terzi, lo share of voice nelle risposte generative, la
+mappa dei domini che costruiscono la reputazione del brand e il confronto fra come
+il brand si racconta e come viene raccontato.
 
-Due sezioni meritano una riga in più.
+Tre sezioni meritano una riga in più.
 
 **La cronistoria** mostra come sono cambiati volume, giudizio e temi lungo la
 finestra scelta, con i picchi spiegati uno per uno e la visibilità negli LLM nel
 tempo. È la differenza fra "il 34 per cento dei giudizi è negativo", che fa alzare
 le spalle, e "era il 19 per cento a ottobre, la salita comincia a marzo ed è quasi
 tutta su un tema solo", che fa prendere il telefono.
+
+**La vista per canale** mostra gli stessi contenuti per piattaforma invece che per
+tema: volume, giudizio, di cosa si parla e come lo si dice, un canale alla volta.
+La riga che conta è il tema dominante, perché quando cambia da un canale all'altro
+vuol dire che il brand ha problemi diversi a seconda di dove lo si ascolta.
 
 **La sezione sui video** analizza le trascrizioni dei canali terzi, non del brand.
 I commenti dicono cosa pensa il pubblico, la trascrizione dice cosa gli è stato
@@ -226,6 +228,11 @@ avere. Un audit con una sola delle due è monco, e quasi tutti ne usano una sola
 ---
 
 ## Personalizzare
+
+**Logo.** In testata compare il logo di chi firma il report, con una variante per il
+fondo scuro. Si cambia con `meta.logo` e `meta.logo_dark` dentro `data.json`, e con
+`meta.logo: false` si toglie del tutto. Se il file non si carica il logo sparisce da
+solo, senza lasciare l'icona di un'immagine rotta.
 
 **Colori.** Il template usa un accento rosso che si cambia in un punto solo, nel
 blocco `:root` in cima a `assets/report_template.html`, oppure passando

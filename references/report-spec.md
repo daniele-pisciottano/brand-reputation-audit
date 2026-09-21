@@ -41,7 +41,10 @@ grafico esce storto, il problema è quasi sempre nei dati, non nel template.
     "competitors": ["Competitor 1", "Competitor 2"],
     "questions": ["Le domande approvate in fase di briefing"],
     "author": "Chi firma il report",
-    "accent": "#E52217"                      // colore di accento, facoltativo
+    "accent": "#E52217",                     // colore di accento, facoltativo
+    "logo": "https://.../logo.svg",          // facoltativo: se manca, quello Moca
+    "logo_dark": "https://.../logo-light.svg" // variante per il fondo scuro
+    // meta.logo = false toglie del tutto il logo dalla testata
   },
 
   "summary": {
@@ -60,9 +63,18 @@ grafico esce storto, il problema è quasi sempre nei dati, non nel template.
     // le fonti saltate o fallite vanno incluse: il perché è informazione
   ],
 
+  // Alimenta due sezioni: il grafico del sentiment per fonte e, insieme a
+  // sources e ai temi, l'intera vista "Canale per canale". I nomi qui devono
+  // combaciare con sources[].name e con le chiavi di themes[].by_source.
   "sentiment_by_source": [
     { "source": "Trustpilot", "positive": 210, "neutral": 80,
       "negative": 170, "mixed": 20, "unclassified": 0 }
+  ],
+
+  // Facoltativo: arricchisce la scheda di un canale nella vista per canale.
+  // Senza questo blocco la scheda si costruisce comunque da sola.
+  "channels": [
+    { "name": "Trustpilot", "note": "Nota specifica per questo canale" }
   ],
 
   "volume_over_time": {
@@ -176,13 +188,6 @@ grafico esce storto, il problema è quasi sempre nei dati, non nel template.
       "review_volume": 1200, "note": "" }
   ],
 
-  "recommendations": [
-    { "title": "Azione in forma imperativa", "evidence": "Il numero che la sostiene",
-      "lever": "Contenuti", "impact": "alto", "effort": "basso",
-      "horizon": "30 giorni" }
-    // impact ed effort: alto | medio | basso
-  ],
-
   "methodology": {
     "notes": ["Come sono stati raccolti e classificati i dati"],
     "limits": ["I limiti dichiarati, uno per riga"],
@@ -233,9 +238,17 @@ quaranta per cento di negativi non è una tendenza, sono tre commenti.
 dell'audit, altrimenti la serie racconta la distribuzione della raccolta invece che
 il cambiamento del sentiment.
 
-**Le sezioni pesanti stanno in fondo.** Riepilogo, temi e risposte generative sono la
-parte che la gente legge. Mappa delle fonti, confronto competitor e metodologia sono
-quella che si va a controllare. L'ordine del template rispetta già questo criterio.
+**Le sezioni pesanti stanno in fondo.** Riepilogo, temi, canali e risposte generative
+sono la parte che la gente legge. Mappa delle fonti, confronto competitor e
+metodologia sono quella che si va a controllare. L'ordine del template rispetta già
+questo criterio.
+
+**La vista per canale non si compila.** Si costruisce da sola incrociando
+`sentiment_by_source`, `sources` e la ripartizione `by_source` dei temi, e pesca le
+citazioni dai temi filtrandole per fonte. L'unica cosa che devi fare è **scrivere i
+nomi dei canali sempre allo stesso modo** nei tre blocchi: "YouTube" in uno e
+"Youtube" nell'altro producono un canale fantasma e uno vuoto. Lo script lo
+segnala, ma è più semplice non sbagliarlo.
 
 ---
 

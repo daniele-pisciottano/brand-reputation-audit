@@ -21,7 +21,7 @@
       "Il brand compare quando si cerca la categoria senza nominarlo",
       "Quali fonti stanno costruendo la percezione del brand agli occhi degli LLM"
     ],
-    "author": "Dataset dimostrativo",
+    "author": "Moca Interactive",
     "accent": "#E52217"
   },
   "summary": {
@@ -759,56 +759,6 @@
       "sentiment_negative": 0.38,
       "review_volume": 410,
       "note": ""
-    }
-  ],
-  "recommendations": [
-    {
-      "title": "Pubblicare una pagina sui tempi e i costi reali di spedizione",
-      "evidence": "412 contenuti sul tema, 289 negativi, ed è la prima obiezione riportata anche dai modelli",
-      "lever": "Contenuti",
-      "impact": "alto",
-      "effort": "basso",
-      "horizon": "30 giorni"
-    },
-    {
-      "title": "Rivendicare il rapporto qualità prezzo nei messaggi principali",
-      "evidence": "214 contenuti positivi su un aspetto che il sito non menziona mai",
-      "lever": "Contenuti",
-      "impact": "alto",
-      "effort": "basso",
-      "horizon": "30 giorni"
-    },
-    {
-      "title": "Aprire un presidio dichiarato sui quattro subreddit di settore",
-      "evidence": "Reddit è la fonte più citata dagli LLM con 21 citazioni, senza nessuna presenza ufficiale",
-      "lever": "Presidio piattaforme",
-      "impact": "alto",
-      "effort": "medio",
-      "horizon": "90 giorni"
-    },
-    {
-      "title": "Farsi includere nei tre comparatori assenti dalla mappa fonti",
-      "evidence": "guidaintegratori, sportenutrizione e rivistafitness valgono 53 citazioni complessive, il brand non compare in nessuno",
-      "lever": "Digital PR",
-      "impact": "alto",
-      "effort": "medio",
-      "horizon": "90 giorni"
-    },
-    {
-      "title": "Allineare le informazioni pubbliche su soglia di spedizione e produzione",
-      "evidence": "Due affermazioni su tre verificate nelle risposte dei modelli sono obsolete o errate",
-      "lever": "Contenuti",
-      "impact": "medio",
-      "effort": "basso",
-      "horizon": "30 giorni"
-    },
-    {
-      "title": "Portare a 24 ore il tempo di prima risposta dell'assistenza",
-      "evidence": "112 contenuti negativi su 187 riguardano i tempi di risposta",
-      "lever": "Servizio clienti",
-      "impact": "medio",
-      "effort": "alto",
-      "horizon": "180 giorni"
     }
   ],
   "methodology": {

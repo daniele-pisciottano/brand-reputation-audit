@@ -64,9 +64,40 @@ li{margin:4px 0}
 .faint{color:var(--faint)}
 
 /* Header */
-header.top{background:var(--surface); border-bottom:1px solid var(--border); padding:36px 0 30px}
-.brandline{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:6px}
+header.top{background:var(--surface); border-bottom:1px solid var(--border); padding:30px 0}
+.brandline{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:14px}
 .eyebrow{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--accent)}
+/* Logo di chi firma il report. Due file, uno per fondo chiaro e uno per fondo
+   scuro, alternati dal tema. Se non caricano si nascondono da soli e resta il
+   nome dell'autore fra i dati in testata: il report non deve mai mostrare
+   l'icona di un'immagine rotta. */
+.logo{height:26px; width:auto; display:block; flex:none}
+.logo.dk{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .logo.lt{display:none}
+  :root:not([data-theme="light"]) .logo.dk{display:block}
+}
+:root[data-theme="dark"] .logo.lt{display:none}
+:root[data-theme="dark"] .logo.dk{display:block}
+:root[data-theme="light"] .logo.lt{display:block}
+:root[data-theme="light"] .logo.dk{display:none}
+
+/* Canali */
+.tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px}
+.tabs button{
+  font:inherit; font-size:13px; font-weight:500; cursor:pointer;
+  padding:7px 14px; border-radius:999px; white-space:nowrap;
+  background:var(--surface); border:1px solid var(--border); color:var(--muted);
+}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.tabs button .n{font-variant-numeric:tabular-nums; opacity:.7; margin-left:6px}
+.pane{display:none}
+.pane.on{display:block}
+.paneName{display:none}
+.mixbar{height:10px; border-radius:5px; background:var(--surface); overflow:hidden; display:flex; margin:4px 0 0}
+.mixbar i{height:100%; display:block}
+.mixbar i+i{margin-left:2px}
 .metarow{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px}
 .chip{
   font-size:12px; padding:4px 10px; border-radius:999px;
@@ -171,22 +202,15 @@ tbody tr:last-child td{border-bottom:none}
 .interp h3{margin-bottom:6px; color:var(--accent)}
 .interp p:last-child{margin-bottom:0}
 
-/* Raccomandazioni */
-.rec{display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--border)}
-.rec:last-child{border-bottom:none}
-.rec .n{
-  flex:none; width:28px; height:28px; border-radius:999px; background:var(--accent);
-  color:var(--accent-ink); display:grid; place-items:center; font-size:13px; font-weight:700;
-}
-.rec .body{flex:1; min-width:0}
-.rec h4{margin-bottom:4px}
-.rec .tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
-
 footer{padding:30px 0 44px; color:var(--faint); font-size:12.5px}
 .note{font-size:12.5px; color:var(--faint); margin-top:10px}
 
 @media print{
-  nav.toc,.themeBtn{display:none}
+  nav.toc,.themeBtn,.tabs{display:none}
+  .pane{display:block; break-inside:avoid; padding-top:8px}
+  .paneName{display:block; font-size:16px; margin:18px 0 10px; text-transform:uppercase; letter-spacing:.04em}
+  .logo.dk{display:none}
+  .logo.lt{display:block}
   body{font-size:11pt}
   section{break-inside:avoid; border-bottom:1px solid #ddd}
   .card{break-inside:avoid}
@@ -204,6 +228,7 @@ footer{padding:30px 0 44px; color:var(--faint); font-size:12.5px}
 <header class="top"><div class="wrap">
   <div class="brandline">
     <span class="eyebrow">Brand Reputation Audit</span>
+    <span id="h-logo"></span>
   </div>
   <h1 id="h-title">&nbsp;</h1>
   <p class="lead" id="h-headline" style="margin-top:10px; max-width:72ch"></p>
@@ -241,6 +266,23 @@ function has(a){ return Array.isArray(a) ? a.length>0 : (a && Object.keys(a).len
 if (meta.accent){
   document.documentElement.style.setProperty('--accent', meta.accent);
 }
+
+/* Logo di chi firma il report. I due file si sostituiscono con meta.logo e
+   meta.logo_dark; meta.logo = false toglie il logo del tutto. */
+var LOGO_DEFAULT      = 'https://mocainteractive.com/assets/svg/logo.svg';
+var LOGO_DARK_DEFAULT = 'https://mocainteractive.com/assets/svg/logo-light.svg';
+(function(){
+  if (meta.logo === false || meta.logo === null) return;
+  var lt = meta.logo || LOGO_DEFAULT;
+  var dk = meta.logo_dark || (meta.logo ? meta.logo : LOGO_DARK_DEFAULT);
+  var alt = meta.author ? meta.author : 'Logo';
+  var box = document.getElementById('h-logo');
+  box.innerHTML = '<img class="logo lt" src="'+esc(lt)+'" alt="'+esc(alt)+'">'
+                + '<img class="logo dk" src="'+esc(dk)+'" alt="'+esc(alt)+'">';
+  [].forEach.call(box.querySelectorAll('img'), function(img){
+    img.addEventListener('error', function(){ box.style.display = 'none'; });
+  });
+})();
 
 /* ---------- Palette delle serie: ordine fisso, mai ciclato ---------- */
 var SERIES_TOKENS = ['--s1','--s2','--s3','--s4','--s5'];
@@ -536,6 +578,102 @@ function draw(id, cfg){
   S('temi','Temi ricorrenti','I temi emergono dal materiale raccolto, non da una lista predefinita. Le citazioni sono testuali.', h);
 })();
 
+/* ===================== 3ter. Canale per canale =====================
+   Non chiede dati nuovi: incrocia sentiment_by_source, sources e i temi con la
+   loro ripartizione per fonte. Cosi' non puo' disallinearsi dal resto del
+   report, e chi compila data.json non deve scrivere due volte le stesse cose. */
+(function(){
+  if (!has(D.sentiment_by_source)) return;
+
+  var extra = {};
+  (D.channels || []).forEach(function(c){ extra[c.name || c.id] = c; });
+  var meta_by_name = {};
+  (D.sources || []).forEach(function(s){ meta_by_name[s.name || s.id] = s; });
+
+  var chans = D.sentiment_by_source.map(function(r){
+    var tot = SENT.reduce(function(a,s){ return a + (r[s.k]||0); }, 0);
+    var themes = (D.themes || []).map(function(t){
+      var v = (t.by_source || {})[r.source] || 0;
+      return v ? { name:t.name, volume:v, share:v/tot } : null;
+    }).filter(Boolean).sort(function(a,b){ return b.volume - a.volume; });
+    var quotes = [];
+    (D.themes || []).forEach(function(t){
+      (t.quotes || []).forEach(function(q){
+        if (q.source === r.source) quotes.push({ q:q, theme:t.name });
+      });
+    });
+    return { name:r.source, row:r, total:tot, themes:themes, quotes:quotes,
+             src:meta_by_name[r.source] || {}, extra:extra[r.source] || {} };
+  }).sort(function(a,b){ return b.total - a.total; });
+
+  if (!chans.length) return;
+  var grand = chans.reduce(function(a,c){ return a + c.total; }, 0) || 1;
+
+  /* La tabella che risponde alla domanda vera: lo stesso brand ha problemi
+     diversi a seconda di dove lo si ascolta. */
+  var h = '<p class="small" style="max-width:72ch">Ogni piattaforma ha un pubblico e norme sue, quindi i '
+    + 'numeri si leggono per canale e non si sommano. La riga che conta è il tema dominante: quando cambia '
+    + 'da un canale all\'altro, il brand ha problemi diversi a seconda di dove lo si ascolta.</p>'
+    + table([{t:'Canale'},{t:'Contenuti',num:true},{t:'Quota',num:true},{t:'Negativi',num:true},{t:'Tema dominante'}],
+        chans.map(function(c){
+          var neg = c.total ? (c.row.negative||0)/c.total : 0;
+          var top = c.themes[0];
+          return [esc(c.name), num(c.total), pct(c.total/grand,0), pct(neg,0),
+                  top ? esc(top.name)+' <span class="faint">'+pct(top.share,0)+'</span>' : ''];
+        }));
+
+  h += '<div class="tabs" id="chTabs">' + chans.map(function(c,i){
+    return '<button type="button" data-i="'+i+'"'+(i===0?' class="on"':'')+'>'
+      + esc(c.name)+'<span class="n">'+num(c.total)+'</span></button>';
+  }).join('') + '</div>';
+
+  h += chans.map(function(c,i){
+    var neg = c.total ? (c.row.negative||0)/c.total : 0;
+    var pos = c.total ? (c.row.positive||0)/c.total : 0;
+    var bar = SENT.map(function(s){
+      var v = c.row[s.k]||0; if (!v) return '';
+      return '<i style="width:'+(v/(c.total||1)*100)+'%; background:'+cssv(s.v)+'"></i>';
+    }).join('');
+
+    var head = '<div class="grid g4" style="margin-bottom:18px">'
+      + '<div class="card kpi"><div class="label">Contenuti</div><div class="value">'+num(c.total)+'</div>'
+      +   '<div class="note">'+pct(c.total/grand,0)+' del totale raccolto</div></div>'
+      + '<div class="card kpi '+(neg>=.4?'critical':(neg>=.25?'warning':''))+'"><div class="label">Negativi</div>'
+      +   '<div class="value">'+pct(neg,0)+'</div><div class="note">'+num(c.row.negative||0)+' contenuti</div></div>'
+      + '<div class="card kpi"><div class="label">Positivi</div><div class="value">'+pct(pos,0)+'</div>'
+      +   '<div class="note">'+num(c.row.positive||0)+' contenuti</div></div>'
+      + '<div class="card"><div class="label" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em; font-weight:600">Composizione</div>'
+      +   '<div class="mixbar" style="margin-top:12px">'+bar+'</div>'
+      +   '<div class="note" style="margin-top:8px">'+esc(c.src.period || '')+'</div></div>'
+      + '</div>';
+
+    var note = c.extra.note || c.src.note;
+    if (note) head += '<p class="small faint" style="margin:-6px 0 18px">'+esc(note)+'</p>';
+
+    var themes = c.themes.length
+      ? '<h3 style="margin:0 0 10px">Di cosa si parla su '+esc(c.name)+'</h3>'
+        + table([{t:'Tema'},{t:'Contenuti',num:true},{t:'Quota del canale',num:true}],
+            c.themes.slice(0,8).map(function(t){
+              return [esc(t.name), num(t.volume), pct(t.share,0)];
+            }))
+      : '';
+
+    var quotes = c.quotes.length
+      ? '<h3 style="margin:26px 0 4px">Come lo dicono</h3>'
+        + c.quotes.slice(0,4).map(function(x){
+            var m = {positive:'pos',negative:'neg',mixed:'mix',neutral:'neu'}[x.q.sentiment]||'neu';
+            return '<div class="quote '+m+'"><p>“'+esc(x.q.text)+'”</p>'
+              + '<div class="src">'+esc(x.theme)+(x.q.date?' · '+esc(x.q.date):'')+'</div></div>';
+          }).join('')
+      : '<p class="note" style="margin-top:20px">Per questo canale non sono state estratte citazioni rappresentative.</p>';
+
+    return '<div class="pane'+(i===0?' on':'')+'" data-i="'+i+'">'
+      + '<h4 class="paneName">'+esc(c.name)+'</h4>' + head + themes + quotes + '</div>';
+  }).join('');
+
+  S('canali','Canale per canale','Gli stessi contenuti visti per piattaforma invece che per tema: volume, giudizio, di cosa si parla e come lo si dice.', h);
+})();
+
 /* ===================== 3bis. Dentro i video =====================
    I commenti dicono cosa pensa il pubblico, la trascrizione dice cosa gli e'
    stato detto. L'unita' e' l'occorrenza in cui il brand viene nominato. */
@@ -670,24 +808,6 @@ function draw(id, cfg){
   S('competitor','Confronto con i competitor','Serve a dare una scala ai numeri: un sentiment negativo del trenta per cento significa cose opposte a seconda del settore.', h);
 })();
 
-/* ===================== 8. Raccomandazioni ===================== */
-(function(){
-  if (!has(D.recommendations)) return;
-  var h = D.recommendations.map(function(r,i){
-    var tags = [];
-    if (r.lever)   tags.push('<span class="chip">'+esc(r.lever)+'</span>');
-    if (r.impact)  tags.push('<span class="chip">Impatto '+esc(r.impact)+'</span>');
-    if (r.effort)  tags.push('<span class="chip">Sforzo '+esc(r.effort)+'</span>');
-    if (r.horizon) tags.push('<span class="chip">'+esc(r.horizon)+'</span>');
-    return '<div class="rec"><div class="n">'+(i+1)+'</div><div class="body">'
-      + '<h4>'+esc(r.title)+'</h4>'
-      + (r.evidence?'<p class="small" style="margin:0">'+esc(r.evidence)+'</p>':'')
-      + (tags.length?'<div class="tags">'+tags.join('')+'</div>':'')
-      + '</div></div>';
-  }).join('');
-  S('azioni','Cosa fare','Ordinate per rapporto fra impatto e sforzo, non per gravità del problema. Ogni azione richiama l\'evidenza che la sostiene.', h);
-})();
-
 /* ===================== 9. Sezioni su misura ===================== */
 (function(){
   if (!has(D.custom_sections)) return;
@@ -711,6 +831,25 @@ function draw(id, cfg){
   if (m.cost_estimate) foot.push('Costo stimato: '+m.cost_estimate);
   if (foot.length) h += '<div class="metarow" style="margin-top:20px">'+foot.map(function(f){ return '<span class="chip">'+esc(f)+'</span>'; }).join('')+'</div>';
   S('metodo','Metodologia e limiti', null, h);
+})();
+
+/* ===================== Tab dei canali ===================== */
+(function(){
+  var tabs = document.getElementById('chTabs'); if (!tabs) return;
+  var sec = tabs.closest('section');
+  tabs.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    var i = b.getAttribute('data-i');
+    [].forEach.call(tabs.querySelectorAll('button'), function(x){ x.classList.toggle('on', x === b); });
+    [].forEach.call(sec.querySelectorAll('.pane'), function(p){
+      p.classList.toggle('on', p.getAttribute('data-i') === i);
+    });
+  });
+  /* In stampa i pannelli nascosti sparirebbero: li apriamo tutti, con il nome
+     del canale in testa, cosi' il PDF contiene tutti i canali e non solo il primo. */
+  window.addEventListener('beforeprint', function(){
+    [].forEach.call(sec.querySelectorAll('.pane'), function(p){ p.classList.add('on'); });
+  });
 })();
 
 /* ===================== Navigazione ===================== */
